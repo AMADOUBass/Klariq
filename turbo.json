@@ -1,6 +1,13 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "ui": "tui",
+  "globalEnv": [
+    "DATABASE_URL",
+    "DATABASE_DIRECT_URL",
+    "REDIS_URL",
+    "NODE_ENV",
+    "BETTER_AUTH_SECRET"
+  ],
   "tasks": {
     "db:generate": {
       "dependsOn": ["^db:generate"],

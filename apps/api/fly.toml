@@ -3,7 +3,7 @@
 # See https://fly.io/docs/reference/configuration/ for information
 
 app = "klariq"
-primary_region = "yul" # Montreal (closest to Neon/Upstash ca-central-1)
+primary_region = "yyz" # Toronto (closest alternative to Montreal)
 
 [build]
   dockerfile = "../../Dockerfile" # We'll put the Dockerfile in the root

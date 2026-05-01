@@ -25,6 +25,28 @@
 
 ---
 
+## Infrastructure & Deployment (Target: Tomorrow)
+
+**Goal:** Establish the production-ready hosting environment for Klariq.
+
+- [ ] **Database (Neon)**
+    - [ ] Create Neon project
+    - [ ] Set up `main` and `dev` branches
+    - [ ] Configure connection strings in root `.env`
+- [ ] **Redis (Upstash)**
+    - [ ] Create Upstash Redis instance (Serverless)
+    - [ ] Configure `REDIS_URL` for BullMQ queues
+- [ ] **Backend API (Fly.io)**
+    - [ ] Initialize Fly.io app for `@klariq/api`
+    - [ ] Set up Dockerfile for NestJS production build
+    - [ ] Configure secrets (DB, Redis, Better-Auth)
+- [ ] **Frontend (Vercel)**
+    - [ ] Connect GitHub repository to Vercel
+    - [ ] Configure `@klariq/web` build settings
+    - [ ] Set up environment variables and domain mapping
+
+---
+
 ## Phase 2: Domain Core (Target: Q2 2026)
 
 **Goal:** A working double-entry accounting engine with multi-tenancy.

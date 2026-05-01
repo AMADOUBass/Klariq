@@ -59,6 +59,7 @@ USER nestjs
 # Set environment variables
 ENV NODE_ENV=production
 ENV PORT=4000
+ENV HOME=/tmp
 
 # Expose the port
 EXPOSE 4000

@@ -2,7 +2,7 @@
 #
 # See https://fly.io/docs/reference/configuration/ for information
 
-app = "klariq-api"
+app = "klariq"
 primary_region = "yul" # Montreal (closest to Neon/Upstash ca-central-1)
 
 [build]

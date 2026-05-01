@@ -26,4 +26,4 @@ primary_region = "yyz" # Toronto (closest alternative to Montreal)
 
 # Optional: Run Prisma migrations before deployment
 [deploy]
-  release_command = "npx prisma migrate deploy --schema=packages/db/prisma/schema.prisma && npm run auth:migrate --prefix apps/api"
+  release_command = "npx turbo run db:migrate:deploy auth:migrate --no-cache"

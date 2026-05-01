@@ -1,4 +1,4 @@
-import { Prisma } from '@prisma/client';
+import { Prisma } from './generated/client';
 import { prisma } from './client';
 
 export type TransactionClient = Prisma.TransactionClient;

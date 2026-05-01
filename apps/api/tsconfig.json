@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "../../packages/config/typescript/nestjs.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "exactOptionalPropertyTypes": false,
+    "paths": {
+      "@klariq/shared": ["../../packages/shared/src/index.ts"],
+      "@klariq/shared/*": ["../../packages/shared/src/*"],
+      "@klariq/db": ["../../packages/db/src/index.ts"],
+      "@klariq/db/*": ["../../packages/db/src/*"],
+      "@t3-oss/env-core": ["../../node_modules/@t3-oss/env-core/dist/index.d.ts"]
+    }
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "test"]
+}

@@ -1,0 +1,89 @@
+@import "tailwindcss";
+
+@theme {
+  /* Obsidian Design System Colors */
+  --color-obsidian-0: #07080B;
+  --color-obsidian-1: #0B0D12;
+  --color-obsidian-2: #11141B;
+  --color-slate-1: #161A23;
+  --color-slate-2: #1E232E;
+  --color-slate-3: #2A303D;
+
+  --color-ink-1: #F2F4F8;
+  --color-ink-2: #B7BECB;
+  --color-ink-3: #7B8493;
+  --color-ink-4: #525B6B;
+
+  --color-accent: oklch(0.74 0.16 245);
+  --color-accent-2: oklch(0.66 0.20 250);
+  --color-accent-soft: oklch(0.74 0.16 245 / 0.14);
+
+  --color-pos: oklch(0.78 0.16 162);
+  --color-pos-soft: oklch(0.78 0.16 162 / 0.14);
+  --color-neg: oklch(0.70 0.20 22);
+  --color-neg-soft: oklch(0.70 0.20 22 / 0.14);
+  --color-warn: oklch(0.82 0.15 78);
+
+  --color-line: rgba(255, 255, 255, 0.06);
+  --color-line-2: rgba(255, 255, 255, 0.10);
+
+  /* Shadcn Mapping */
+  --color-background: var(--color-obsidian-0);
+  --color-foreground: var(--color-ink-1);
+  --color-primary: var(--color-accent);
+  --color-primary-foreground: var(--color-obsidian-0);
+  --color-secondary: var(--color-slate-2);
+  --color-secondary-foreground: var(--color-ink-1);
+  --color-muted: var(--color-slate-1);
+  --color-muted-foreground: var(--color-ink-3);
+  --color-border: var(--color-line);
+  --color-input: var(--color-line-2);
+  --color-ring: var(--color-accent);
+
+  --radius: 0.75rem;
+
+  --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'Cascadia Code', monospace;
+}
+
+@layer base {
+  * {
+    border-color: var(--color-border);
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    background-image: 
+      radial-gradient(1200px 600px at 80% -10%, rgba(64,120,255,0.08), transparent 60%),
+      radial-gradient(800px 500px at -10% 110%, rgba(0,180,200,0.05), transparent 60%);
+    background-attachment: fixed;
+    min-height: 100vh;
+  }
+}
+
+@layer utilities {
+  .glass {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.025), rgba(255, 255, 255, 0.008));
+    border: 1px solid var(--color-line);
+    backdrop-filter: blur(18px) saturate(140%);
+    box-shadow: 0 1px 0 rgba(255, 255, 255, 0.04) inset, 0 0 0 1px rgba(0, 0, 0, 0.2), 0 30px 60px -30px rgba(0, 0, 0, 0.6);
+  }
+
+  .glass-strong {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.012));
+    border: 1px solid var(--color-line-2);
+    backdrop-filter: blur(22px) saturate(160%);
+  }
+
+  .hairline {
+    border: 1px solid var(--color-line);
+  }
+
+  .dot-grid {
+    background-image: radial-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+    background-size: 18px 18px;
+  }
+}

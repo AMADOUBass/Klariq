@@ -1,0 +1,181 @@
+{
+  "home": {
+    "badge": "Phase 1 — Fondations",
+    "title": "Klariq",
+    "description": "Comptabilité cloud pour entreprises québécoises. Les fondations de la Phase 1 sont opérationnelles.",
+    "features": {
+      "api": {
+        "title": "API NestJS",
+        "description": "Monolithe modulaire avec authentification, multi-tenancy et piste d'audit."
+      },
+      "auth": {
+        "title": "Better-Auth",
+        "description": "Email/password + organisations + 2FA optionnel. Hachage Argon2id."
+      },
+      "multitenancy": {
+        "title": "Multi-tenancy",
+        "description": "Isolation company_id forcée au niveau du guard et de l'intercepteur."
+      },
+      "i18n": {
+        "title": "FR / EN",
+        "description": "Routage par langue avec next-intl. Priorité au français pour la conformité Loi 25."
+      }
+    }
+  },
+  "nav": {
+    "section_main": "Espace de travail",
+    "dashboard": "Tableau de bord",
+    "transactions": "Transactions",
+    "invoicing": "Facturation",
+    "bills": "Factures & dépenses",
+    "banking": "Banque",
+    "section_books": "Comptabilité",
+    "ledger": "Grand livre",
+    "reports": "Rapports",
+    "taxes": "Taxes",
+    "section_admin": "Administration",
+    "clients": "Clients",
+    "team": "Équipe",
+    "audit": "Piste d'audit",
+    "settings": "Paramètres"
+  },
+  "dashboard": {
+    "cmd": "Rechercher écritures, clients, factures…",
+    "shortcut": "⌘K",
+    "period": "Période",
+    "ytd": "Cumul annuel",
+    "qtd": "Trimestre",
+    "mtd": "Mois",
+    "live": "En direct",
+    "lastSync": "Synchronisé",
+    "tenant": "Espace",
+    "welcome": "Bon après-midi, Amélie",
+    "welcomeSub": "Voici l'activité de vos 4 entités — 29 avr. 2026.",
+    "kpi": {
+      "cash": "Trésorerie",
+      "ar": "Comptes clients",
+      "ap": "Comptes fournisseurs",
+      "runway": "Autonomie opérationnelle"
+    },
+    "delta": {
+      "vs": "vs mois dernier"
+    },
+    "cashTitle": "Trésorerie",
+    "cashSub": "Consolidé sur l'ensemble des comptes bancaires",
+    "arTitle": "Balance âgée — Clients",
+    "apTitle": "Balance âgée — Fournisseurs",
+    "plTitle": "Résultat — Cumul annuel",
+    "plSub": "1 janv. – 29 avr. 2026",
+    "revenue": "Produits",
+    "cogs": "Coût des ventes",
+    "gross": "Marge brute",
+    "opex": "Charges d'exploitation",
+    "ebitda": "BAIIA",
+    "tax": "Provision fiscale",
+    "netIncome": "Résultat net",
+    "activityTitle": "Activité",
+    "activitySub": "Dernières écritures à valider",
+    "reconcile": "Rapprocher",
+    "view": "Voir",
+    "open": "Ouvrir",
+    "buckets": {
+      "current": "Courant",
+      "b30": "1–30",
+      "b60": "31–60",
+      "b90": "61–90",
+      "b90p": "90+"
+    },
+    "reviewQueue": "File de validation",
+    "reviewSub": "12 éléments en attente d'approbation",
+    "auditNote": "Écritures signées cryptographiquement",
+    "newEntry": "Nouvelle écriture",
+    "export": "Exporter"
+  },
+  "auth": {
+    "signIn": {
+      "title": "Bon retour",
+      "subtitle": "Accédez à votre tableau de bord financier",
+      "emailLabel": "Adresse courriel",
+      "passwordLabel": "Mot de passe",
+      "submit": "Se connecter",
+      "noAccount": "Pas encore de compte ?",
+      "signUpLink": "Créez-en un gratuitement",
+      "forgotPassword": "Mot de passe oublié ?",
+      "success": "Connexion réussie",
+      "error": "Courriel ou mot de passe invalide"
+    },
+    "signUp": {
+      "title": "Démarrez avec Klariq",
+      "subtitle": "La comptabilité moderne pour les équipes performantes",
+      "nameLabel": "Nom complet",
+      "emailLabel": "Adresse courriel",
+      "passwordLabel": "Mot de passe",
+      "submit": "Créer mon compte",
+      "hasAccount": "Déjà un compte ?",
+      "signInLink": "Connectez-vous ici",
+      "success": "Compte créé avec succès !",
+      "error": "Une erreur est survenue. Veuillez réessayer."
+    },
+    "forgotPassword": {
+      "title": "Réinitialiser le mot de passe",
+      "subtitle": "Nous vous enverrons un lien pour réinitialiser votre mot de passe",
+      "emailLabel": "Adresse courriel",
+      "submit": "Envoyer le lien",
+      "backToSignIn": "Retour à la connexion",
+      "success": "Vérifiez vos courriels pour le lien de réinitialisation"
+    }
+  },
+  "onboarding": {
+    "title": "Bienvenue sur Klariq",
+    "subtitle": "Configurons votre environnement d'affaires",
+    "steps": {
+      "entity": "Entité",
+      "tax": "Taxes",
+      "fiscal": "Fiscalité",
+      "summary": "Résumé"
+    },
+    "messages": {
+      "validationError": "Veuillez corriger les erreurs avant de continuer.",
+      "creating": "Création de l'entreprise...",
+      "success": "Entreprise créée avec succès !",
+      "error": "Échec de la configuration. Veuillez réessayer."
+    },
+    "entity": {
+      "title": "Parlez-nous de votre entreprise",
+      "nameLabel": "Nom de l'entreprise",
+      "legalNameLabel": "Raison sociale",
+      "addressLabel": "Adresse d'affaires",
+      "cityLabel": "Ville",
+      "provinceLabel": "Province",
+      "postalCodeLabel": "Code postal",
+      "next": "Passer aux taxes"
+    },
+    "tax": {
+      "title": "Configuration fiscale",
+      "subtitle": "Les entreprises québécoises doivent s'inscrire à la TPS et à la TVQ.",
+      "gstLabel": "Numéro de TPS",
+      "qstLabel": "Numéro de TVQ",
+      "frequencyLabel": "Fréquence de déclaration",
+      "freq": {
+        "monthly": "Mensuelle",
+        "quarterly": "Trimestrielle",
+        "annually": "Annuelle"
+      },
+      "next": "Passer à l'exercice financier"
+    },
+    "fiscal": {
+      "title": "Exercice & Devise",
+      "yearStartLabel": "Début de l'exercice financier",
+      "currencyLabel": "Devise de base",
+      "next": "Finaliser la configuration"
+    },
+    "complete": {
+      "title": "Tout est prêt !",
+      "subtitle": "Votre espace de travail est opérationnel. Redirection vers le tableau de bord...",
+      "finish": "Accéder au tableau de bord"
+    },
+    "errors": {
+      "alreadyExists": "Une entreprise avec ce nom existe déjà. Veuillez en choisir un autre."
+    }
+  }
+}

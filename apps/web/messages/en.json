@@ -1,0 +1,181 @@
+{
+  "home": {
+    "badge": "Phase 1 — Scaffolding",
+    "title": "Klariq",
+    "description": "Cloud accounting for Quebec businesses. Phase 1 foundation is running.",
+    "features": {
+      "api": {
+        "title": "NestJS API",
+        "description": "Modular monolith with auth, tenancy, and audit scaffolding."
+      },
+      "auth": {
+        "title": "Better-Auth",
+        "description": "Email/password + organizations + optional 2FA. Argon2id hashing."
+      },
+      "multitenancy": {
+        "title": "Multi-tenancy",
+        "description": "company_id isolation enforced at guard and interceptor levels."
+      },
+      "i18n": {
+        "title": "FR / EN",
+        "description": "Locale routing with next-intl. French-first for Quebec compliance."
+      }
+    }
+  },
+  "nav": {
+    "section_main": "Workspace",
+    "dashboard": "Dashboard",
+    "transactions": "Transactions",
+    "invoicing": "Invoicing",
+    "bills": "Bills & Expenses",
+    "banking": "Banking",
+    "section_books": "Books",
+    "ledger": "General Ledger",
+    "reports": "Reports",
+    "taxes": "Taxes",
+    "section_admin": "Admin",
+    "clients": "Clients",
+    "team": "Team",
+    "audit": "Audit Trail",
+    "settings": "Settings"
+  },
+  "dashboard": {
+    "cmd": "Search ledger, clients, invoices…",
+    "shortcut": "⌘K",
+    "period": "Period",
+    "ytd": "Year to date",
+    "qtd": "Quarter",
+    "mtd": "Month",
+    "live": "Live",
+    "lastSync": "Synced",
+    "tenant": "Workspace",
+    "welcome": "Good afternoon, Amélie",
+    "welcomeSub": "Here's what's happening across 4 entities — Apr 29, 2026.",
+    "kpi": {
+      "cash": "Cash position",
+      "ar": "Accounts receivable",
+      "ap": "Accounts payable",
+      "runway": "Operating runway"
+    },
+    "delta": {
+      "vs": "vs last month"
+    },
+    "cashTitle": "Cash position",
+    "cashSub": "Consolidated across all bank accounts",
+    "arTitle": "AR aging",
+    "apTitle": "AP aging",
+    "plTitle": "Profit & Loss — YTD",
+    "plSub": "Jan 1 – Apr 29, 2026",
+    "revenue": "Revenue",
+    "cogs": "Cost of goods sold",
+    "gross": "Gross profit",
+    "opex": "Operating expenses",
+    "ebitda": "EBITDA",
+    "tax": "Tax provision",
+    "netIncome": "Net income",
+    "activityTitle": "Activity",
+    "activitySub": "Latest postings requiring review",
+    "reconcile": "Reconcile",
+    "view": "View",
+    "open": "Open",
+    "buckets": {
+      "current": "Current",
+      "b30": "1–30",
+      "b60": "31–60",
+      "b90": "61–90",
+      "b90p": "90+"
+    },
+    "reviewQueue": "Review queue",
+    "reviewSub": "12 items awaiting your approval",
+    "auditNote": "All entries cryptographically signed",
+    "newEntry": "New entry",
+    "export": "Export"
+  },
+  "auth": {
+    "signIn": {
+      "title": "Welcome back",
+      "subtitle": "Access your financial dashboard",
+      "emailLabel": "Email address",
+      "passwordLabel": "Password",
+      "submit": "Sign in",
+      "noAccount": "Don't have an account?",
+      "signUpLink": "Create one for free",
+      "forgotPassword": "Forgot your password?",
+      "success": "Signed in successfully",
+      "error": "Invalid email or password"
+    },
+    "signUp": {
+      "title": "Get started with Klariq",
+      "subtitle": "Modern accounting for modern teams",
+      "nameLabel": "Full name",
+      "emailLabel": "Email address",
+      "passwordLabel": "Password",
+      "submit": "Create account",
+      "hasAccount": "Already have an account?",
+      "signInLink": "Sign in here",
+      "success": "Account created successfully!",
+      "error": "Something went wrong. Please try again."
+    },
+    "forgotPassword": {
+      "title": "Reset password",
+      "subtitle": "We'll send you a link to reset your password",
+      "emailLabel": "Email address",
+      "submit": "Send reset link",
+      "backToSignIn": "Back to sign in",
+      "success": "Check your email for a reset link"
+    }
+  },
+  "onboarding": {
+    "title": "Welcome to Klariq",
+    "subtitle": "Let's set up your business environment",
+    "steps": {
+      "entity": "Entity",
+      "tax": "Taxation",
+      "fiscal": "Fiscal",
+      "summary": "Review"
+    },
+    "messages": {
+      "validationError": "Please fix the errors before continuing.",
+      "creating": "Creating company...",
+      "success": "Company created successfully!",
+      "error": "Failed to complete onboarding. Please try again."
+    },
+    "entity": {
+      "title": "Tell us about your business",
+      "nameLabel": "Business name",
+      "legalNameLabel": "Legal name",
+      "addressLabel": "Business address",
+      "cityLabel": "City",
+      "provinceLabel": "Province",
+      "postalCodeLabel": "Postal code",
+      "next": "Continue to tax settings"
+    },
+    "tax": {
+      "title": "Tax configuration",
+      "subtitle": "Quebec businesses require GST and QST registration.",
+      "gstLabel": "GST Number (TPS)",
+      "qstLabel": "QST Number (TVQ)",
+      "frequencyLabel": "Reporting frequency",
+      "freq": {
+        "monthly": "Monthly",
+        "quarterly": "Quarterly",
+        "annually": "Annually"
+      },
+      "next": "Continue to fiscal year"
+    },
+    "fiscal": {
+      "title": "Fiscal year & currency",
+      "yearStartLabel": "Fiscal year start",
+      "currencyLabel": "Base currency",
+      "next": "Complete setup"
+    },
+    "complete": {
+      "title": "All set!",
+      "subtitle": "Your workspace is ready. Taking you to the dashboard...",
+      "finish": "Go to dashboard"
+    },
+    "errors": {
+      "alreadyExists": "A company with this name already exists. Please choose another one."
+    }
+  }
+}

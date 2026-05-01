@@ -1,0 +1,992 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=1440" />
+<title>Klariq — Dashboard</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<style>
+  :root {
+    --obsidian-0: #07080B;
+    --obsidian-1: #0B0D12;
+    --obsidian-2: #11141B;
+    --slate-1:    #161A23;
+    --slate-2:    #1E232E;
+    --slate-3:    #2A303D;
+    --line:       rgba(255,255,255,0.06);
+    --line-2:     rgba(255,255,255,0.10);
+    --ink-1:      #F2F4F8;
+    --ink-2:      #B7BECB;
+    --ink-3:      #7B8493;
+    --ink-4:      #525B6B;
+    --accent:     oklch(0.74 0.16 245);
+    --accent-2:   oklch(0.66 0.20 250);
+    --accent-soft:oklch(0.74 0.16 245 / 0.14);
+    --pos:        oklch(0.78 0.16 162);
+    --pos-soft:   oklch(0.78 0.16 162 / 0.14);
+    --neg:        oklch(0.70 0.20 22);
+    --neg-soft:   oklch(0.70 0.20 22 / 0.14);
+    --warn:       oklch(0.82 0.15 78);
+  }
+  html, body { background: var(--obsidian-0); color: var(--ink-1); }
+  body {
+    font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, sans-serif;
+    font-feature-settings: "ss01","cv11";
+    -webkit-font-smoothing: antialiased;
+    background:
+      radial-gradient(1200px 600px at 80% -10%, rgba(64,120,255,0.08), transparent 60%),
+      radial-gradient(800px 500px at -10% 110%, rgba(0,180,200,0.05), transparent 60%),
+      var(--obsidian-0);
+    min-height: 100vh;
+  }
+  .mono { font-family: 'JetBrains Mono', ui-monospace, monospace; font-variant-numeric: tabular-nums; }
+  .num  { font-variant-numeric: tabular-nums; font-feature-settings: "tnum","lnum"; }
+
+  /* glass surfaces */
+  .glass {
+    background: linear-gradient(180deg, rgba(255,255,255,0.025), rgba(255,255,255,0.008));
+    border: 1px solid var(--line);
+    backdrop-filter: blur(18px) saturate(140%);
+    -webkit-backdrop-filter: blur(18px) saturate(140%);
+    box-shadow:
+      0 1px 0 rgba(255,255,255,0.04) inset,
+      0 0 0 1px rgba(0,0,0,0.2),
+      0 30px 60px -30px rgba(0,0,0,0.6);
+  }
+  .glass-strong {
+    background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.012));
+    border: 1px solid var(--line-2);
+    backdrop-filter: blur(22px) saturate(160%);
+  }
+  .hairline { border: 1px solid var(--line); }
+  .hairline-b { border-bottom: 1px solid var(--line); }
+  .hairline-t { border-top: 1px solid var(--line); }
+  .hairline-r { border-right: 1px solid var(--line); }
+
+  /* dotted grid for chart bg */
+  .dot-grid {
+    background-image: radial-gradient(rgba(255,255,255,0.05) 1px, transparent 1px);
+    background-size: 18px 18px;
+  }
+
+  /* scrollbar */
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.06); border-radius: 8px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+
+  /* selection */
+  ::selection { background: rgba(80,140,255,0.35); }
+
+  /* focus rings */
+  .ring-accent:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+
+  /* subtle animated pulse for "live" dot */
+  @keyframes pulse-ring {
+    0%   { box-shadow: 0 0 0 0 rgba(120,180,255,0.55); }
+    100% { box-shadow: 0 0 0 7px rgba(120,180,255,0);   }
+  }
+  .live-dot { animation: pulse-ring 1.8s cubic-bezier(.4,0,.6,1) infinite; }
+
+  /* tabular row hover */
+  .row-hover:hover { background: rgba(255,255,255,0.02); }
+
+  /* gradient stroke wrap */
+  .grad-border { position: relative; }
+  .grad-border::before {
+    content:""; position:absolute; inset:0; border-radius: inherit; padding:1px;
+    background: linear-gradient(180deg, rgba(120,170,255,0.35), rgba(120,170,255,0) 60%);
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+    -webkit-mask-composite: xor; mask-composite: exclude; pointer-events: none;
+  }
+
+  /* tiny dividers */
+  .vsep { width:1px; align-self: stretch; background: var(--line); }
+</style>
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel" data-presets="react">
+  const { useState, useMemo, useEffect } = React;
+
+  /* -------------------- i18n -------------------- */
+  const I18N = {
+    en: {
+      nav: {
+        section_main: "Workspace",
+        dashboard: "Dashboard",
+        transactions: "Transactions",
+        invoicing: "Invoicing",
+        bills: "Bills & Expenses",
+        banking: "Banking",
+        section_books: "Books",
+        ledger: "General Ledger",
+        reports: "Reports",
+        taxes: "Taxes",
+        section_admin: "Admin",
+        clients: "Clients",
+        team: "Team",
+        audit: "Audit Trail",
+        settings: "Settings",
+      },
+      cmd: "Search ledger, clients, invoices…",
+      shortcut: "⌘K",
+      period: "Period",
+      ytd: "Year to date",
+      qtd: "Quarter",
+      mtd: "Month",
+      live: "Live",
+      lastSync: "Synced",
+      tenant: "Workspace",
+      welcome: "Good afternoon, Amélie",
+      welcomeSub: "Here's what's happening across 4 entities — Apr 29, 2026.",
+      kpi: {
+        cash: "Cash position",
+        ar: "Accounts receivable",
+        ap: "Accounts payable",
+        runway: "Operating runway",
+      },
+      delta: { vs: "vs last month" },
+      cashTitle: "Cash position",
+      cashSub: "Consolidated across all bank accounts",
+      arTitle: "AR aging",
+      apTitle: "AP aging",
+      plTitle: "Profit & Loss — YTD",
+      plSub: "Jan 1 – Apr 29, 2026",
+      revenue: "Revenue",
+      cogs: "Cost of goods sold",
+      gross: "Gross profit",
+      opex: "Operating expenses",
+      ebitda: "EBITDA",
+      tax: "Tax provision",
+      netIncome: "Net income",
+      activityTitle: "Activity",
+      activitySub: "Latest postings requiring review",
+      reconcile: "Reconcile",
+      view: "View",
+      open: "Open",
+      buckets: { current: "Current", b30: "1–30", b60: "31–60", b90: "61–90", b90p: "90+" },
+      reviewQueue: "Review queue",
+      reviewSub: "12 items awaiting your approval",
+      auditNote: "All entries cryptographically signed",
+      newEntry: "New entry",
+      export: "Export",
+    },
+    fr: {
+      nav: {
+        section_main: "Espace de travail",
+        dashboard: "Tableau de bord",
+        transactions: "Transactions",
+        invoicing: "Facturation",
+        bills: "Factures & dépenses",
+        banking: "Banque",
+        section_books: "Comptabilité",
+        ledger: "Grand livre",
+        reports: "Rapports",
+        taxes: "Taxes",
+        section_admin: "Administration",
+        clients: "Clients",
+        team: "Équipe",
+        audit: "Piste d'audit",
+        settings: "Paramètres",
+      },
+      cmd: "Rechercher écritures, clients, factures…",
+      shortcut: "⌘K",
+      period: "Période",
+      ytd: "Cumul annuel",
+      qtd: "Trimestre",
+      mtd: "Mois",
+      live: "En direct",
+      lastSync: "Synchronisé",
+      tenant: "Espace",
+      welcome: "Bon après-midi, Amélie",
+      welcomeSub: "Voici l'activité de vos 4 entités — 29 avr. 2026.",
+      kpi: {
+        cash: "Trésorerie",
+        ar: "Comptes clients",
+        ap: "Comptes fournisseurs",
+        runway: "Autonomie opérationnelle",
+      },
+      delta: { vs: "vs mois dernier" },
+      cashTitle: "Trésorerie",
+      cashSub: "Consolidé sur l'ensemble des comptes bancaires",
+      arTitle: "Balance âgée — Clients",
+      apTitle: "Balance âgée — Fournisseurs",
+      plTitle: "Résultat — Cumul annuel",
+      plSub: "1 janv. – 29 avr. 2026",
+      revenue: "Produits",
+      cogs: "Coût des ventes",
+      gross: "Marge brute",
+      opex: "Charges d'exploitation",
+      ebitda: "BAIIA",
+      tax: "Provision fiscale",
+      netIncome: "Résultat net",
+      activityTitle: "Activité",
+      activitySub: "Dernières écritures à valider",
+      reconcile: "Rapprocher",
+      view: "Voir",
+      open: "Ouvrir",
+      buckets: { current: "Courant", b30: "1–30", b60: "31–60", b90: "61–90", b90p: "90+" },
+      reviewQueue: "File de validation",
+      reviewSub: "12 éléments en attente d'approbation",
+      auditNote: "Écritures signées cryptographiquement",
+      newEntry: "Nouvelle écriture",
+      export: "Exporter",
+    },
+  };
+
+  /* -------------------- Icons (custom, monoline) -------------------- */
+  const Icon = ({ d, size=18, stroke=1.5, className="" }) => (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none"
+         stroke="currentColor" strokeWidth={stroke}
+         strokeLinecap="round" strokeLinejoin="round" className={className}>
+      {d}
+    </svg>
+  );
+  const I = {
+    dashboard: <Icon d={<><path d="M3 12 12 4l9 8"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/></>}/>,
+    tx:        <Icon d={<><path d="M4 7h13"/><path d="M14 4l3 3-3 3"/><path d="M20 17H7"/><path d="M10 20l-3-3 3-3"/></>}/>,
+    invoice:   <Icon d={<><path d="M6 3h10l3 3v15l-3-2-2 2-2-2-2 2-2-2-2 2V3z"/><path d="M9 8h7"/><path d="M9 12h7"/><path d="M9 16h4"/></>}/>,
+    bills:     <Icon d={<><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 10h18"/><path d="M7 15h4"/></>}/>,
+    bank:      <Icon d={<><path d="M3 10 12 4l9 6"/><path d="M5 10v8"/><path d="M9 10v8"/><path d="M15 10v8"/><path d="M19 10v8"/><path d="M3 20h18"/></>}/>,
+    ledger:    <Icon d={<><path d="M5 4h12a2 2 0 0 1 2 2v14H7a2 2 0 0 1-2-2V4z"/><path d="M5 18a2 2 0 0 0 2 2"/><path d="M9 8h6"/><path d="M9 12h6"/></>}/>,
+    reports:   <Icon d={<><path d="M4 20V8"/><path d="M10 20V4"/><path d="M16 20v-9"/><path d="M22 20H2"/></>}/>,
+    tax:       <Icon d={<><circle cx="12" cy="12" r="9"/><path d="M8 16l8-8"/><circle cx="9" cy="9" r="1"/><circle cx="15" cy="15" r="1"/></>}/>,
+    clients:   <Icon d={<><circle cx="9" cy="9" r="3.2"/><path d="M3 19c0-3 3-5 6-5s6 2 6 5"/><circle cx="17" cy="7" r="2.4"/><path d="M15 13c3 0 6 1.6 6 4"/></>}/>,
+    team:      <Icon d={<><circle cx="12" cy="8" r="3.4"/><path d="M5 20c0-3.5 3-6 7-6s7 2.5 7 6"/></>}/>,
+    audit:     <Icon d={<><path d="M12 3 4 6v6c0 4.5 3.4 8.3 8 9 4.6-.7 8-4.5 8-9V6l-8-3z"/><path d="m9 12 2 2 4-4"/></>}/>,
+    settings:  <Icon d={<><circle cx="12" cy="12" r="3"/><path d="M19.4 12a7.4 7.4 0 0 0-.1-1.4l2-1.5-2-3.4-2.3.9a7.5 7.5 0 0 0-2.4-1.4L14 3h-4l-.6 2.2a7.5 7.5 0 0 0-2.4 1.4l-2.3-.9-2 3.4 2 1.5a7.4 7.4 0 0 0 0 2.8l-2 1.5 2 3.4 2.3-.9a7.5 7.5 0 0 0 2.4 1.4L10 21h4l.6-2.2a7.5 7.5 0 0 0 2.4-1.4l2.3.9 2-3.4-2-1.5c.06-.46.1-.93.1-1.4z"/></>}/>,
+    search:    <Icon d={<><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></>}/>,
+    bell:      <Icon d={<><path d="M6 8a6 6 0 0 1 12 0c0 7 3 8 3 8H3s3-1 3-8z"/><path d="M10 21a2 2 0 0 0 4 0"/></>}/>,
+    plus:      <Icon d={<><path d="M12 5v14"/><path d="M5 12h14"/></>}/>,
+    download:  <Icon d={<><path d="M12 4v12"/><path d="m7 11 5 5 5-5"/><path d="M5 20h14"/></>}/>,
+    chevron:   <Icon d={<><path d="m6 9 6 6 6-6"/></>}/>,
+    filter:    <Icon d={<><path d="M4 5h16"/><path d="M7 12h10"/><path d="M10 19h4"/></>}/>,
+    spark:     <Icon d={<><path d="M3 17 9 9l4 4 8-9"/></>}/>,
+    lock:      <Icon d={<><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></>}/>,
+    arrowUp:   <Icon d={<><path d="M7 17 17 7"/><path d="M9 7h8v8"/></>}/>,
+    arrowDn:   <Icon d={<><path d="M7 7l10 10"/><path d="M17 9v8H9"/></>}/>,
+    dot:       <Icon d={<><circle cx="12" cy="12" r="3"/></>}/>,
+  };
+
+  /* -------------------- Number helpers -------------------- */
+  const fmt = (n, lang="en", opts={}) => {
+    const locale = lang === "fr" ? "fr-CA" : "en-CA";
+    return new Intl.NumberFormat(locale, { maximumFractionDigits: 0, ...opts }).format(n);
+  };
+  const fmtMoney = (n, lang="en") => {
+    const locale = lang === "fr" ? "fr-CA" : "en-CA";
+    return new Intl.NumberFormat(locale, { style:"currency", currency:"CAD", maximumFractionDigits: 0 }).format(n);
+  };
+  const fmtMoneyDecimal = (n, lang="en") => {
+    const locale = lang === "fr" ? "fr-CA" : "en-CA";
+    return new Intl.NumberFormat(locale, { style:"currency", currency:"CAD", minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(n);
+  };
+
+  /* -------------------- Sidebar -------------------- */
+  function Sidebar({ t }) {
+    const item = (icon, label, opts={}) => (
+      <a href="#" className={`group flex items-center gap-3 px-3 py-2 rounded-lg text-[13px] transition
+                 ${opts.active ? "text-white bg-white/[0.04] border border-white/[0.06]"
+                                : "text-[var(--ink-2)] hover:text-white hover:bg-white/[0.025] border border-transparent"}`}>
+        <span className={`${opts.active ? "text-white" : "text-[var(--ink-3)] group-hover:text-[var(--ink-1)]"} transition`}>
+          {icon}
+        </span>
+        <span className="flex-1 truncate">{label}</span>
+        {opts.badge && (
+          <span className="mono text-[10px] px-1.5 py-0.5 rounded-md bg-white/[0.05] text-[var(--ink-2)] border border-white/[0.06]">
+            {opts.badge}
+          </span>
+        )}
+        {opts.dot && <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent)]"/>}
+      </a>
+    );
+    const section = (title) => (
+      <div className="px-3 pt-5 pb-2 text-[10px] tracking-[0.18em] uppercase text-[var(--ink-4)] font-medium">{title}</div>
+    );
+
+    return (
+      <aside className="w-[248px] shrink-0 hairline-r flex flex-col"
+             style={{background:"linear-gradient(180deg, rgba(255,255,255,0.012), rgba(255,255,255,0))"}}>
+        {/* brand */}
+        <div className="px-5 h-[64px] flex items-center gap-3 hairline-b">
+          <div className="relative w-8 h-8 rounded-lg flex items-center justify-center"
+               style={{background:"linear-gradient(135deg, oklch(0.74 0.16 245), oklch(0.55 0.20 260))",
+                       boxShadow:"0 6px 18px -6px rgba(80,140,255,0.6), inset 0 1px 0 rgba(255,255,255,0.25)"}}>
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M5 4v16"/><path d="M5 12h7l6-8"/><path d="M12 12l6 8"/>
+            </svg>
+          </div>
+          <div className="leading-none">
+            <div className="text-[15px] font-semibold tracking-tight">Klariq</div>
+            <div className="mono text-[10px] text-[var(--ink-3)] mt-0.5">v4.12 · ledger</div>
+          </div>
+        </div>
+
+        {/* tenant switcher */}
+        <button className="mx-3 mt-3 px-3 py-2.5 rounded-lg flex items-center gap-3 hairline hover:bg-white/[0.025] transition text-left">
+          <div className="w-7 h-7 rounded-md flex items-center justify-center mono text-[11px] font-semibold"
+               style={{background:"oklch(0.30 0.04 250)", color:"oklch(0.92 0.04 250)"}}>NV</div>
+          <div className="flex-1 min-w-0">
+            <div className="text-[12px] text-[var(--ink-2)]">{t.tenant}</div>
+            <div className="text-[13px] font-medium truncate">Nordvale Holdings</div>
+          </div>
+          <span className="text-[var(--ink-3)]">{I.chevron}</span>
+        </button>
+
+        <nav className="flex-1 px-2 mt-2 overflow-y-auto">
+          {section(t.nav.section_main)}
+          <div className="space-y-0.5">
+            {item(I.dashboard, t.nav.dashboard, {active:true})}
+            {item(I.tx, t.nav.transactions, {badge:"284"})}
+            {item(I.invoice, t.nav.invoicing, {dot:true})}
+            {item(I.bills, t.nav.bills)}
+            {item(I.bank, t.nav.banking)}
+          </div>
+
+          {section(t.nav.section_books)}
+          <div className="space-y-0.5">
+            {item(I.ledger, t.nav.ledger)}
+            {item(I.reports, t.nav.reports)}
+            {item(I.tax, t.nav.taxes, {badge:"Q2"})}
+          </div>
+
+          {section(t.nav.section_admin)}
+          <div className="space-y-0.5">
+            {item(I.clients, t.nav.clients)}
+            {item(I.team, t.nav.team)}
+            {item(I.audit, t.nav.audit)}
+            {item(I.settings, t.nav.settings)}
+          </div>
+        </nav>
+
+        {/* footer card */}
+        <div className="m-3 p-3 rounded-xl glass">
+          <div className="flex items-center gap-2 text-[11px] text-[var(--ink-3)]">
+            <span className="text-[var(--pos)]">{I.lock}</span>
+            <span>SOC 2 Type II</span>
+            <span className="ml-auto mono text-[10px]">256-bit</span>
+          </div>
+          <div className="mt-2 text-[11px] text-[var(--ink-2)] leading-snug">
+            Immutable ledger · cryptographically signed entries.
+          </div>
+        </div>
+      </aside>
+    );
+  }
+
+  /* -------------------- Topbar -------------------- */
+  function Topbar({ t, lang, setLang, period, setPeriod }) {
+    return (
+      <header className="h-[64px] px-6 flex items-center gap-4 hairline-b sticky top-0 z-20"
+              style={{background:"rgba(7,8,11,0.72)", backdropFilter:"blur(18px) saturate(140%)"}}>
+        <div>
+          <div className="text-[10px] tracking-[0.18em] uppercase text-[var(--ink-4)]">{t.nav.dashboard}</div>
+          <div className="text-[14px] font-medium -mt-0.5">Nordvale Holdings <span className="text-[var(--ink-3)]">/ Consolidated</span></div>
+        </div>
+
+        <div className="flex-1 flex justify-center">
+          <button className="w-[420px] h-9 px-3 hairline rounded-lg flex items-center gap-2 text-[13px] text-[var(--ink-3)]
+                             hover:text-[var(--ink-1)] hover:border-white/10 transition bg-white/[0.015]">
+            {I.search}
+            <span className="flex-1 text-left truncate">{t.cmd}</span>
+            <span className="mono text-[10px] px-1.5 py-0.5 rounded-md bg-white/[0.05] border border-white/[0.06] text-[var(--ink-2)]">{t.shortcut}</span>
+          </button>
+        </div>
+
+        {/* period */}
+        <div className="hairline rounded-lg p-0.5 flex items-center text-[11px]">
+          {[
+            ["MTD", t.mtd], ["QTD", t.qtd], ["YTD", t.ytd],
+          ].map(([k, label])=>(
+            <button key={k} onClick={()=>setPeriod(k)}
+              className={`px-2.5 py-1 rounded-md transition ${period===k ? "bg-white/[0.06] text-white" : "text-[var(--ink-3)] hover:text-[var(--ink-1)]"}`}>
+              {label}
+            </button>
+          ))}
+        </div>
+
+        {/* lang toggle */}
+        <div className="hairline rounded-lg p-0.5 flex items-center text-[11px] mono">
+          {["en","fr"].map(L=>(
+            <button key={L} onClick={()=>setLang(L)}
+              className={`px-2.5 py-1 rounded-md uppercase tracking-wider transition
+                          ${lang===L ? "bg-white/[0.06] text-white" : "text-[var(--ink-3)] hover:text-[var(--ink-1)]"}`}>
+              {L}
+            </button>
+          ))}
+        </div>
+
+        <div className="vsep mx-1"/>
+
+        <button className="w-9 h-9 hairline rounded-lg flex items-center justify-center text-[var(--ink-2)] hover:text-white hover:border-white/10 transition relative">
+          {I.bell}
+          <span className="absolute top-2 right-2 w-1.5 h-1.5 rounded-full bg-[var(--accent)]"/>
+        </button>
+
+        <button className="h-9 px-3 rounded-lg text-[12.5px] font-medium flex items-center gap-2 transition"
+                style={{background:"linear-gradient(180deg, oklch(0.78 0.16 245), oklch(0.62 0.20 250))",
+                        color:"#0A0B0F", boxShadow:"0 6px 18px -6px rgba(80,140,255,0.55), inset 0 1px 0 rgba(255,255,255,0.35)"}}>
+          {I.plus} {t.newEntry}
+        </button>
+
+        <div className="flex items-center gap-2 pl-1">
+          <div className="w-8 h-8 rounded-full hairline overflow-hidden flex items-center justify-center mono text-[11px] font-semibold"
+               style={{background:"oklch(0.40 0.06 30)", color:"oklch(0.95 0.04 80)"}}>AB</div>
+        </div>
+      </header>
+    );
+  }
+
+  /* -------------------- KPI card with sparkline -------------------- */
+  function Sparkline({ data, color="var(--accent)", area=true, height=44 }) {
+    const w = 160, h = height, pad = 2;
+    const min = Math.min(...data), max = Math.max(...data);
+    const range = max - min || 1;
+    const pts = data.map((v,i)=>{
+      const x = pad + (i/(data.length-1)) * (w - pad*2);
+      const y = h - pad - ((v-min)/range) * (h - pad*2);
+      return [x,y];
+    });
+    const path = pts.map(([x,y],i)=> (i===0?`M${x},${y}`:`L${x},${y}`)).join(" ");
+    const areaP = `${path} L${pts[pts.length-1][0]},${h} L${pts[0][0]},${h} Z`;
+    const id = "sg-" + Math.random().toString(36).slice(2,7);
+    return (
+      <svg width={w} height={h} viewBox={`0 0 ${w} ${h}`} className="overflow-visible">
+        <defs>
+          <linearGradient id={id} x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0%" stopColor={color} stopOpacity="0.35"/>
+            <stop offset="100%" stopColor={color} stopOpacity="0"/>
+          </linearGradient>
+        </defs>
+        {area && <path d={areaP} fill={`url(#${id})`}/>}
+        <path d={path} fill="none" stroke={color} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+        <circle cx={pts[pts.length-1][0]} cy={pts[pts.length-1][1]} r="2.6" fill={color}/>
+        <circle cx={pts[pts.length-1][0]} cy={pts[pts.length-1][1]} r="6" fill={color} opacity="0.18"/>
+      </svg>
+    );
+  }
+
+  function KPI({ label, value, sub, delta, deltaDir="up", spark, sparkColor, accent }) {
+    const positive = deltaDir === "up";
+    return (
+      <div className="glass rounded-xl p-5 flex flex-col gap-4 relative overflow-hidden">
+        {accent && (
+          <span className="absolute -right-10 -top-10 w-40 h-40 rounded-full blur-3xl opacity-30"
+                style={{background: accent}}/>
+        )}
+        <div className="flex items-center justify-between relative">
+          <div className="text-[11px] tracking-[0.14em] uppercase text-[var(--ink-3)]">{label}</div>
+          <div className="flex items-center gap-1.5 text-[11px] mono"
+               style={{color: positive ? "var(--pos)" : "var(--neg)"}}>
+            {positive ? I.arrowUp : I.arrowDn}
+            <span>{delta}</span>
+          </div>
+        </div>
+        <div className="flex items-end justify-between gap-3 relative">
+          <div>
+            <div className="num text-[30px] leading-none font-semibold tracking-tight">{value}</div>
+            <div className="text-[11.5px] text-[var(--ink-3)] mt-2">{sub}</div>
+          </div>
+          <Sparkline data={spark} color={sparkColor || "var(--accent)"} />
+        </div>
+      </div>
+    );
+  }
+
+  /* -------------------- Cash position chart -------------------- */
+  function CashChart({ t, lang }) {
+    // 12 weeks of cash
+    const weeks = ["W6","W8","W10","W12","W14","W16","W18","W20","W22","W24","W26","W28"];
+    const series = [3120, 3260, 3180, 3420, 3680, 3540, 3820, 4080, 3960, 4220, 4380, 4612];
+    const projected = [4612, 4540, 4720, 4910]; // dashed forward
+    const allData = [...series, ...projected.slice(1)];
+    const min = 2900, max = 5100;
+    const W = 720, H = 240, padL = 44, padR = 12, padT = 12, padB = 28;
+    const xs = allData.length;
+    const xAt = (i)=> padL + (i/(xs-1)) * (W - padL - padR);
+    const yAt = (v)=> padT + (1 - (v-min)/(max-min)) * (H - padT - padB);
+
+    const seriesPts = series.map((v,i)=>[xAt(i), yAt(v)]);
+    const projPts = projected.map((v,i)=>[xAt(series.length-1+i), yAt(v)]);
+
+    const linePath = seriesPts.map(([x,y],i)=>(i===0?`M${x},${y}`:`L${x},${y}`)).join(" ");
+    const projPath = projPts.map(([x,y],i)=>(i===0?`M${x},${y}`:`L${x},${y}`)).join(" ");
+    const areaPath = `${linePath} L${seriesPts[seriesPts.length-1][0]},${H-padB} L${seriesPts[0][0]},${H-padB} Z`;
+
+    const yTicks = [3000, 3500, 4000, 4500, 5000];
+
+    return (
+      <div className="glass rounded-xl p-5">
+        <div className="flex items-start justify-between">
+          <div>
+            <div className="flex items-center gap-2.5">
+              <div className="text-[14px] font-medium">{t.cashTitle}</div>
+              <span className="flex items-center gap-1.5 text-[10px] mono uppercase tracking-wider text-[var(--ink-3)]">
+                <span className="w-1.5 h-1.5 rounded-full bg-[var(--accent)] live-dot"/>
+                {t.live}
+              </span>
+            </div>
+            <div className="text-[12px] text-[var(--ink-3)] mt-1">{t.cashSub}</div>
+          </div>
+          <div className="text-right">
+            <div className="num text-[26px] font-semibold tracking-tight">{fmtMoney(4612394, lang)}</div>
+            <div className="mono text-[11px] text-[var(--pos)] mt-1">+{fmt(412800, lang)} · +9.8% {t.delta.vs}</div>
+          </div>
+        </div>
+
+        {/* legend */}
+        <div className="mt-4 flex items-center gap-5 text-[11px] text-[var(--ink-3)]">
+          <span className="flex items-center gap-2"><span className="w-3 h-[2px] bg-[var(--accent)]"/>{lang==="fr"?"Solde réel":"Actual balance"}</span>
+          <span className="flex items-center gap-2"><span className="w-3 border-t border-dashed border-[var(--accent)]"/>{lang==="fr"?"Projection 4 sem.":"4-week projection"}</span>
+          <span className="flex items-center gap-2"><span className="w-3 h-[2px]" style={{background:"var(--ink-4)"}}/>{lang==="fr"?"Seuil cible":"Target floor"}</span>
+        </div>
+
+        <svg viewBox={`0 0 ${W} ${H}`} className="w-full mt-3" preserveAspectRatio="none">
+          <defs>
+            <linearGradient id="cashArea" x1="0" x2="0" y1="0" y2="1">
+              <stop offset="0%" stopColor="var(--accent)" stopOpacity="0.30"/>
+              <stop offset="100%" stopColor="var(--accent)" stopOpacity="0"/>
+            </linearGradient>
+          </defs>
+          {/* horizontal grid */}
+          {yTicks.map(v=>(
+            <g key={v}>
+              <line x1={padL} x2={W-padR} y1={yAt(v)} y2={yAt(v)} stroke="rgba(255,255,255,0.05)" strokeDasharray="2 4"/>
+              <text x={padL-8} y={yAt(v)+3} fill="var(--ink-4)" fontSize="9.5" textAnchor="end" fontFamily="JetBrains Mono">
+                {(v/1000).toFixed(1)}k
+              </text>
+            </g>
+          ))}
+          {/* target floor */}
+          <line x1={padL} x2={W-padR} y1={yAt(3300)} y2={yAt(3300)} stroke="var(--ink-4)" strokeWidth="1" strokeDasharray="3 3" opacity="0.5"/>
+
+          <path d={areaPath} fill="url(#cashArea)"/>
+          <path d={linePath} fill="none" stroke="var(--accent)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+          <path d={projPath} fill="none" stroke="var(--accent)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" strokeDasharray="4 4" opacity="0.7"/>
+
+          {seriesPts.map(([x,y],i)=>(
+            <circle key={i} cx={x} cy={y} r="2" fill="var(--obsidian-0)" stroke="var(--accent)" strokeWidth="1.2"/>
+          ))}
+          {/* highlighted last actual */}
+          <circle cx={seriesPts[seriesPts.length-1][0]} cy={seriesPts[seriesPts.length-1][1]} r="9" fill="var(--accent)" opacity="0.18"/>
+          <circle cx={seriesPts[seriesPts.length-1][0]} cy={seriesPts[seriesPts.length-1][1]} r="3.5" fill="var(--accent)"/>
+
+          {/* x-axis labels */}
+          {weeks.map((w,i)=>(
+            <text key={w} x={xAt(i)} y={H-8} fill="var(--ink-4)" fontSize="9.5" textAnchor="middle" fontFamily="JetBrains Mono">{w}</text>
+          ))}
+        </svg>
+      </div>
+    );
+  }
+
+  /* -------------------- Aging chart (stacked) -------------------- */
+  function AgingChart({ title, total, totalLabel, lang, t, data, tone="accent" }) {
+    // data: [{key, label, value, count}]
+    const sum = data.reduce((s,d)=>s+d.value,0);
+    const tones = {
+      accent: ["oklch(0.78 0.16 245)","oklch(0.70 0.16 245)","oklch(0.62 0.16 245)","oklch(0.54 0.16 245)","oklch(0.48 0.16 245)"],
+      warm:   ["oklch(0.85 0.13 80)","oklch(0.78 0.16 60)","oklch(0.72 0.18 40)","oklch(0.66 0.20 25)","oklch(0.60 0.22 20)"],
+    };
+    const palette = tones[tone];
+
+    return (
+      <div className="glass rounded-xl p-5">
+        <div className="flex items-start justify-between">
+          <div>
+            <div className="text-[14px] font-medium">{title}</div>
+            <div className="text-[12px] text-[var(--ink-3)] mt-1">{totalLabel}</div>
+          </div>
+          <div className="text-right">
+            <div className="num text-[22px] font-semibold tracking-tight">{fmtMoney(total, lang)}</div>
+            <div className="mono text-[11px] text-[var(--ink-3)] mt-1">{fmt(data.reduce((s,d)=>s+d.count,0), lang)} {lang==="fr"?"factures":"invoices"}</div>
+          </div>
+        </div>
+
+        {/* stacked bar */}
+        <div className="mt-5 h-2 w-full rounded-full overflow-hidden flex" style={{background:"rgba(255,255,255,0.04)"}}>
+          {data.map((d,i)=>(
+            <div key={d.key} style={{width:`${(d.value/sum)*100}%`, background: palette[i]}} />
+          ))}
+        </div>
+
+        {/* legend buckets */}
+        <div className="mt-5 grid grid-cols-5 gap-2">
+          {data.map((d,i)=>(
+            <div key={d.key} className="rounded-lg px-2.5 py-2.5 hairline" style={{background:"rgba(255,255,255,0.012)"}}>
+              <div className="flex items-center gap-1.5">
+                <span className="w-1.5 h-1.5 rounded-full" style={{background: palette[i]}}/>
+                <span className="text-[10.5px] text-[var(--ink-3)] mono uppercase tracking-wider">{d.label}</span>
+              </div>
+              <div className="num text-[14px] font-medium mt-2 leading-none">{fmtMoney(d.value, lang)}</div>
+              <div className="mono text-[10px] text-[var(--ink-4)] mt-1.5">{d.count} · {((d.value/sum)*100).toFixed(0)}%</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  /* -------------------- P&L Summary -------------------- */
+  function PLSummary({ t, lang }) {
+    // Building a YTD P&L with monthly bars and line items
+    const months = ["Jan","Feb","Mar","Apr"];
+    const monthsFr = ["Jan.","Févr.","Mars","Avr."];
+    const rev = [842, 938, 1024, 1112];
+    const exp = [612, 644, 705, 738];
+
+    const lines = [
+      { k:"revenue", v: 3916400, delta:"+12.4%", dir:"up", indent:0, weight:"medium" },
+      { k:"cogs",    v: -1142800, delta:"+6.8%",  dir:"down", indent:1, weight:"normal" },
+      { k:"gross",   v: 2773600, delta:"+15.0%", dir:"up", indent:0, weight:"medium", subtle:true },
+      { k:"opex",    v: -1556200, delta:"+8.1%",  dir:"down", indent:1, weight:"normal" },
+      { k:"ebitda",  v: 1217400, delta:"+24.6%", dir:"up", indent:0, weight:"medium", subtle:true },
+      { k:"tax",     v: -304350,  delta:"+22.1%", dir:"down", indent:1, weight:"normal" },
+    ];
+    const net = 913050;
+
+    const max = Math.max(...rev, ...exp);
+
+    return (
+      <div className="glass rounded-xl p-5">
+        <div className="flex items-start justify-between">
+          <div>
+            <div className="text-[14px] font-medium">{t.plTitle}</div>
+            <div className="text-[12px] text-[var(--ink-3)] mt-1">{t.plSub}</div>
+          </div>
+          <button className="hairline rounded-md px-2.5 h-7 text-[11px] flex items-center gap-1.5 text-[var(--ink-2)] hover:text-white hover:border-white/10 transition">
+            {I.download} {t.export}
+          </button>
+        </div>
+
+        {/* combined bars */}
+        <div className="mt-5 grid grid-cols-4 gap-3 h-[148px]">
+          {months.map((m,i)=>(
+            <div key={m} className="flex flex-col justify-end items-center gap-1.5">
+              <div className="w-full flex items-end gap-1 h-full">
+                <div className="flex-1 rounded-t-sm relative"
+                     style={{height:`${(rev[i]/max)*100}%`,
+                             background:"linear-gradient(180deg, oklch(0.78 0.16 245), oklch(0.55 0.20 260))"}}>
+                  <span className="absolute -top-5 left-1/2 -translate-x-1/2 mono text-[9.5px] text-[var(--ink-2)] whitespace-nowrap">
+                    {fmt(rev[i], lang)}k
+                  </span>
+                </div>
+                <div className="flex-1 rounded-t-sm"
+                     style={{height:`${(exp[i]/max)*100}%`,
+                             background:"linear-gradient(180deg, rgba(255,255,255,0.18), rgba(255,255,255,0.05))"}}/>
+              </div>
+              <div className="mono text-[10px] text-[var(--ink-4)] uppercase tracking-wider">{lang==="fr"?monthsFr[i]:m}</div>
+            </div>
+          ))}
+        </div>
+
+        <div className="flex items-center gap-4 mt-2 text-[10.5px] text-[var(--ink-3)]">
+          <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-sm" style={{background:"oklch(0.74 0.16 245)"}}/>{t.revenue}</span>
+          <span className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-sm" style={{background:"rgba(255,255,255,0.18)"}}/>{lang==="fr"?"Charges":"Expenses"}</span>
+        </div>
+
+        {/* line items */}
+        <div className="mt-5 hairline-t pt-3 space-y-1">
+          {lines.map((l)=>(
+            <div key={l.k}
+                 className={`flex items-center justify-between py-1.5 px-2 -mx-2 rounded-md row-hover
+                             ${l.subtle ? "bg-white/[0.018]" : ""}`}>
+              <div className={`text-[12.5px] ${l.weight==="medium"?"font-medium text-white":"text-[var(--ink-2)]"}`}
+                   style={{paddingLeft: l.indent ? 14 : 0}}>{t[l.k]}</div>
+              <div className="flex items-center gap-4">
+                <span className={`mono text-[10.5px] ${l.dir==="up"?"text-[var(--pos)]":"text-[var(--ink-3)]"}`}>{l.delta}</span>
+                <span className={`num text-[12.5px] ${l.weight==="medium"?"text-white font-medium":"text-[var(--ink-2)]"}`}>
+                  {fmtMoney(l.v, lang)}
+                </span>
+              </div>
+            </div>
+          ))}
+          <div className="hairline-t mt-2 pt-3 flex items-center justify-between px-2 -mx-2">
+            <div className="text-[13px] font-semibold tracking-tight">{t.netIncome}</div>
+            <div className="flex items-center gap-3">
+              <span className="text-[10.5px] mono px-2 py-0.5 rounded-md"
+                    style={{background:"var(--pos-soft)", color:"var(--pos)"}}>+18.2%</span>
+              <span className="num text-[18px] font-semibold tracking-tight">{fmtMoney(net, lang)}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  /* -------------------- Activity Feed -------------------- */
+  function Activity({ t, lang }) {
+    const items = [
+      { id:"JE-2826", type:"je", title: lang==="fr"?"Écriture de paie · avr.":"Payroll journal · Apr",
+        meta:"Auto · Gusto", amount:-184_220, status:"posted", time:"14:02", flag:false },
+      { id:"INV-4471", type:"ar", title:"Lumen Photonics Inc.",
+        meta:lang==="fr"?"Facture #4471 · Net 30":"Invoice #4471 · Net 30", amount: 92_400, status:"sent", time:"13:48", flag:true },
+      { id:"BILL-1199", type:"ap", title:"AWS — usage",
+        meta:lang==="fr"?"Facture du 28 avr.":"Bill dated Apr 28", amount:-22_840, status:"approved", time:"12:20", flag:false },
+      { id:"BANK-5512", type:"bank", title: lang==="fr"?"Virement entrant — RBC":"Wire received — RBC",
+        meta:"Atlas Mfg. Ltd.", amount: 412_000, status:"reconciled", time:"11:05", flag:false },
+      { id:"JE-2825", type:"je", title: lang==="fr"?"Régularisation TPS/TVQ":"GST/QST adjustment",
+        meta:lang==="fr"?"Préparé par M. Tremblay":"Prepared by M. Tremblay", amount:-3_120, status:"review", time:"10:14", flag:true },
+      { id:"INV-4470", type:"ar", title:"Brio Health Systems",
+        meta:lang==="fr"?"Facture #4470 · Net 45":"Invoice #4470 · Net 45", amount: 56_800, status:"sent", time:"09:42", flag:false },
+    ];
+    const tag = (s)=> {
+      const map = {
+        posted:    {fr:"Comptabilisé", en:"Posted",     fg:"var(--ink-2)", bg:"rgba(255,255,255,0.05)"},
+        sent:      {fr:"Envoyée",      en:"Sent",       fg:"var(--accent)", bg:"var(--accent-soft)"},
+        approved:  {fr:"Approuvée",    en:"Approved",   fg:"var(--pos)",    bg:"var(--pos-soft)"},
+        reconciled:{fr:"Rapprochée",   en:"Reconciled", fg:"var(--pos)",    bg:"var(--pos-soft)"},
+        review:    {fr:"À valider",    en:"Review",     fg:"var(--warn)",   bg:"oklch(0.82 0.15 78 / 0.14)"},
+      };
+      const it = map[s];
+      return <span className="mono text-[10px] px-2 py-0.5 rounded-md" style={{color:it.fg, background:it.bg}}>{it[lang]}</span>;
+    };
+    const typeIcon = (ty)=>{
+      if (ty==="je") return <span className="text-[var(--ink-2)]">{I.ledger}</span>;
+      if (ty==="ar") return <span style={{color:"var(--accent)"}}>{I.invoice}</span>;
+      if (ty==="ap") return <span className="text-[var(--ink-2)]">{I.bills}</span>;
+      if (ty==="bank") return <span style={{color:"var(--pos)"}}>{I.bank}</span>;
+      return I.dot;
+    };
+
+    return (
+      <div className="glass rounded-xl p-5 flex flex-col">
+        <div className="flex items-start justify-between mb-1">
+          <div>
+            <div className="flex items-center gap-2">
+              <div className="text-[14px] font-medium">{t.activityTitle}</div>
+              <span className="mono text-[10px] text-[var(--ink-3)] px-1.5 py-0.5 rounded-md hairline">12 {lang==="fr"?"nouvelles":"new"}</span>
+            </div>
+            <div className="text-[12px] text-[var(--ink-3)] mt-1">{t.activitySub}</div>
+          </div>
+          <button className="hairline rounded-md px-2.5 h-7 text-[11px] flex items-center gap-1.5 text-[var(--ink-2)] hover:text-white hover:border-white/10 transition">
+            {I.filter} {lang==="fr"?"Filtrer":"Filter"}
+          </button>
+        </div>
+
+        <div className="hairline-t mt-3 -mx-5">
+          {items.map((it,i)=>(
+            <div key={it.id} className={`px-5 py-3 flex items-center gap-3 row-hover ${i!==items.length-1?"hairline-b":""}`}>
+              <div className="w-8 h-8 rounded-md flex items-center justify-center hairline shrink-0"
+                   style={{background:"rgba(255,255,255,0.018)"}}>
+                {typeIcon(it.type)}
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <span className="text-[13px] font-medium truncate">{it.title}</span>
+                  {it.flag && <span className="w-1.5 h-1.5 rounded-full bg-[var(--warn)]"/>}
+                </div>
+                <div className="flex items-center gap-2 mt-0.5">
+                  <span className="mono text-[10.5px] text-[var(--ink-4)]">{it.id}</span>
+                  <span className="text-[var(--ink-4)]">·</span>
+                  <span className="text-[11.5px] text-[var(--ink-3)] truncate">{it.meta}</span>
+                </div>
+              </div>
+              <div className="text-right">
+                <div className="num text-[13px] font-medium"
+                     style={{color: it.amount >= 0 ? "var(--pos)" : "var(--ink-1)"}}>
+                  {it.amount >= 0 ? "+" : ""}{fmtMoneyDecimal(it.amount, lang)}
+                </div>
+                <div className="mt-1 flex items-center gap-2 justify-end">
+                  {tag(it.status)}
+                  <span className="mono text-[10px] text-[var(--ink-4)]">{it.time}</span>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="hairline-t mt-2 pt-3 flex items-center justify-between text-[11px] text-[var(--ink-3)]">
+          <div className="flex items-center gap-2">
+            <span className="text-[var(--pos)]">{I.lock}</span>
+            <span>{t.auditNote}</span>
+          </div>
+          <button className="text-[var(--accent)] hover:underline mono text-[11px]">
+            {lang==="fr"?"Voir tout":"View all"} →
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  /* -------------------- Bank & Entities side panel -------------------- */
+  function BanksPanel({ t, lang }) {
+    const banks = [
+      { name:"RBC Operating · CAD", num:"•• 4421", bal: 2_184_320, delta:"+1.2%", dir:"up" },
+      { name:"BMO Reserve · CAD",   num:"•• 8810", bal: 1_412_900, delta:"−0.4%", dir:"down" },
+      { name:"Wise USD · USD",      num:"•• 0044", bal:   612_840, delta:"+3.1%", dir:"up" },
+      { name:"Stripe Balance",      num:"acct_18", bal:   402_334, delta:"+11.0%", dir:"up" },
+    ];
+    const entities = [
+      { code:"NV",  name:"Nordvale Holdings",   share: 100, color:"oklch(0.74 0.16 245)" },
+      { code:"AT",  name:"Atlas Mfg. Ltd.",     share: 70,  color:"oklch(0.78 0.16 162)" },
+      { code:"LM",  name:"Lumen Photonics Inc.",share: 55,  color:"oklch(0.82 0.15 78)" },
+      { code:"BH",  name:"Brio Health Systems", share: 32,  color:"oklch(0.70 0.20 22)" },
+    ];
+    return (
+      <div className="glass rounded-xl p-5">
+        <div className="flex items-center justify-between">
+          <div className="text-[14px] font-medium">{lang==="fr"?"Comptes & entités":"Accounts & entities"}</div>
+          <span className="mono text-[10px] text-[var(--ink-3)]">{lang==="fr"?"Synchronisé il y a 2 min":"Synced 2 min ago"}</span>
+        </div>
+
+        <div className="mt-4 space-y-2.5">
+          {banks.map(b=>(
+            <div key={b.num} className="flex items-center gap-3 p-2.5 rounded-lg hairline" style={{background:"rgba(255,255,255,0.012)"}}>
+              <div className="w-8 h-8 rounded-md flex items-center justify-center text-[var(--ink-2)]"
+                   style={{background:"rgba(255,255,255,0.025)"}}>{I.bank}</div>
+              <div className="flex-1 min-w-0">
+                <div className="text-[12.5px] font-medium truncate">{b.name}</div>
+                <div className="mono text-[10.5px] text-[var(--ink-4)]">{b.num}</div>
+              </div>
+              <div className="text-right">
+                <div className="num text-[13px] font-medium">{fmtMoney(b.bal, lang)}</div>
+                <div className="mono text-[10px]" style={{color: b.dir==="up" ? "var(--pos)" : "var(--neg)"}}>{b.delta}</div>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="hairline-t mt-5 pt-4">
+          <div className="flex items-center justify-between">
+            <div className="text-[12px] text-[var(--ink-3)]">{lang==="fr"?"Entités consolidées":"Consolidated entities"}</div>
+            <span className="mono text-[10px] text-[var(--ink-3)]">4 / 4</span>
+          </div>
+          <div className="mt-3 space-y-2.5">
+            {entities.map(e=>(
+              <div key={e.code} className="flex items-center gap-3">
+                <div className="w-7 h-7 rounded-md mono text-[10.5px] font-semibold flex items-center justify-center"
+                     style={{background:"rgba(255,255,255,0.04)", color:e.color, border:"1px solid rgba(255,255,255,0.06)"}}>
+                  {e.code}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="text-[12.5px] truncate">{e.name}</div>
+                  <div className="h-1 mt-1.5 rounded-full overflow-hidden" style={{background:"rgba(255,255,255,0.05)"}}>
+                    <div className="h-full" style={{width:`${e.share}%`, background:e.color}}/>
+                  </div>
+                </div>
+                <div className="mono text-[11px] text-[var(--ink-2)] w-10 text-right">{e.share}%</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  /* -------------------- App -------------------- */
+  function App() {
+    const [lang, setLang]   = useState("en");
+    const [period, setPeriod] = useState("YTD");
+    const t = I18N[lang];
+
+    const arData = [
+      { key:"current", label:t.buckets.current, value: 412_300, count: 18 },
+      { key:"b30",     label:t.buckets.b30,     value: 284_500, count: 12 },
+      { key:"b60",     label:t.buckets.b60,     value: 142_700, count: 7 },
+      { key:"b90",     label:t.buckets.b90,     value:  68_400, count: 4 },
+      { key:"b90p",    label:t.buckets.b90p,    value:  21_900, count: 2 },
+    ];
+    const apData = [
+      { key:"current", label:t.buckets.current, value: 286_100, count: 22 },
+      { key:"b30",     label:t.buckets.b30,     value: 142_300, count: 14 },
+      { key:"b60",     label:t.buckets.b60,     value:  84_600, count: 9 },
+      { key:"b90",     label:t.buckets.b90,     value:  31_200, count: 5 },
+      { key:"b90p",    label:t.buckets.b90p,    value:  12_400, count: 1 },
+    ];
+
+    return (
+      <div className="min-h-screen flex">
+        <Sidebar t={t}/>
+        <div className="flex-1 min-w-0 flex flex-col">
+          <Topbar t={t} lang={lang} setLang={setLang} period={period} setPeriod={setPeriod}/>
+          <main className="flex-1 px-7 py-6">
+            {/* Greeting */}
+            <div className="flex items-end justify-between mb-6">
+              <div>
+                <h1 className="text-[24px] font-semibold tracking-tight">{t.welcome}</h1>
+                <p className="text-[13px] text-[var(--ink-3)] mt-1">{t.welcomeSub}</p>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="mono text-[10.5px] text-[var(--ink-3)] px-2.5 py-1 hairline rounded-md flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-[var(--pos)] live-dot"/>
+                  {t.lastSync} 14:02 EDT
+                </span>
+                <button className="hairline rounded-md px-3 h-8 text-[12px] flex items-center gap-1.5 text-[var(--ink-2)] hover:text-white hover:border-white/10 transition">
+                  {I.download} {t.export}
+                </button>
+              </div>
+            </div>
+
+            {/* KPIs */}
+            <div className="grid grid-cols-4 gap-4">
+              <KPI label={t.kpi.cash}
+                   value={fmtMoney(4612394, lang)}
+                   sub={lang==="fr"?"Sur 4 comptes · CAD consolidé":"Across 4 accounts · CAD consolidated"}
+                   delta="+9.8%" deltaDir="up"
+                   spark={[3120,3260,3180,3420,3680,3540,3820,4080,3960,4220,4380,4612]}
+                   sparkColor="oklch(0.78 0.16 245)"
+                   accent="oklch(0.74 0.16 245 / 0.5)"/>
+              <KPI label={t.kpi.ar}
+                   value={fmtMoney(929800, lang)}
+                   sub={lang==="fr"?"43 factures ouvertes · DSO 38 j":"43 open invoices · DSO 38 d"}
+                   delta="+4.2%" deltaDir="up"
+                   spark={[820,840,790,860,880,900,895,910,920,915,925,930]}
+                   sparkColor="oklch(0.78 0.16 162)"/>
+              <KPI label={t.kpi.ap}
+                   value={fmtMoney(556600, lang)}
+                   sub={lang==="fr"?"51 factures · DPO 27 j":"51 bills · DPO 27 d"}
+                   delta="−2.4%" deltaDir="down"
+                   spark={[610,605,600,612,608,595,588,580,575,572,560,557]}
+                   sparkColor="oklch(0.82 0.15 78)"/>
+              <KPI label={t.kpi.runway}
+                   value={`14.2 ${lang==="fr"?"mois":"mo"}`}
+                   sub={lang==="fr"?"Burn moyen 324 k$/mois":"Avg burn $324K/mo"}
+                   delta="+1.1 mo" deltaDir="up"
+                   spark={[10,10.4,10.8,11.2,11.5,12.1,12.4,12.9,13.3,13.6,13.9,14.2]}
+                   sparkColor="oklch(0.78 0.16 245)"/>
+            </div>
+
+            {/* Cash + side panel */}
+            <div className="grid grid-cols-3 gap-4 mt-4">
+              <div className="col-span-2">
+                <CashChart t={t} lang={lang}/>
+              </div>
+              <BanksPanel t={t} lang={lang}/>
+            </div>
+
+            {/* Aging row */}
+            <div className="grid grid-cols-2 gap-4 mt-4">
+              <AgingChart title={t.arTitle} totalLabel={lang==="fr"?"Total à recevoir":"Total receivable"}
+                          total={929800} lang={lang} t={t} data={arData} tone="accent"/>
+              <AgingChart title={t.apTitle} totalLabel={lang==="fr"?"Total à payer":"Total payable"}
+                          total={556600} lang={lang} t={t} data={apData} tone="warm"/>
+            </div>
+
+            {/* P&L + Activity */}
+            <div className="grid grid-cols-5 gap-4 mt-4">
+              <div className="col-span-2"><PLSummary t={t} lang={lang}/></div>
+              <div className="col-span-3"><Activity t={t} lang={lang}/></div>
+            </div>
+
+            <div className="h-10"/>
+          </main>
+        </div>
+      </div>
+    );
+  }
+
+  ReactDOM.createRoot(document.getElementById("root")).render(<App/>);
+  </script>
+</body>
+</html>

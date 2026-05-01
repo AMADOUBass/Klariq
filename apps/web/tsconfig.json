@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "extends": "../../packages/config/typescript/nextjs.json",
+  "compilerOptions": {
+    "outDir": ".next",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ],
+      "@klariq/shared": [
+        "../../packages/shared/src/index.ts"
+      ],
+      "@klariq/shared/*": [
+        "../../packages/shared/src/*"
+      ]
+    },
+    "noEmit": true,
+    "esModuleInterop": true,
+    "exactOptionalPropertyTypes": false
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "../../packages/shared/src/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

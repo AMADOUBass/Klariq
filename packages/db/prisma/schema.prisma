@@ -1,0 +1,513 @@
+// Klariq — Prisma Schema
+// Phase 1: datasource + generator only.
+// All domain models are added in Phase 2. See docs/DATABASE.md.
+//
+// Connection notes:
+//   DATABASE_URL      → pooled connection via PgBouncer (used at runtime)
+//   DATABASE_DIRECT_URL → direct connection (used by prisma migrate)
+//
+// Neon serverless requires connection_limit=1 on the pooled URL.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─── Better-Auth Models ──────────────────────────────────────────────────────
+
+model User {
+  id               String    @id
+  name             String
+  email            String    @unique
+  emailVerified    Boolean
+  image            String?
+  createdAt        DateTime
+  updatedAt        DateTime
+  twoFactorEnabled Boolean?
+  sessions         Session[]
+  accounts         AccountAuth[]
+  members          Member[]
+  invitations      Invitation[]
+  twoFactors       TwoFactor[]
+  auditLogs        AuditLog[]
+
+  @@map("user")
+}
+
+model Session {
+  id        String   @id
+  expiresAt DateTime
+  token     String   @unique
+  createdAt DateTime
+  updatedAt DateTime
+  ipAddress String?
+  userAgent String?
+  userId    String
+  activeOrganizationId String?
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("session")
+}
+
+model AccountAuth {
+  id                    String    @id
+  accountId             String
+  providerId            String
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+  scope                 String?
+  password              String?
+  createdAt             DateTime
+  updatedAt             DateTime
+
+  @@map("account")
+}
+
+model Organization {
+  id          String   @id
+  name        String
+  slug        String   @unique
+  logo        String?
+  createdAt   DateTime
+  metadata    String?
+  members     Member[]
+  invitations Invitation[]
+
+  @@map("organization")
+}
+
+model Member {
+  id             String       @id
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  userId         String
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role           String
+  createdAt      DateTime
+
+  @@map("member")
+}
+
+model Invitation {
+  id             String       @id
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  email          String
+  role           String?
+  status         String
+  expiresAt      DateTime
+  createdAt      DateTime
+  inviterId      String
+  user           User         @relation(fields: [inviterId], references: [id], onDelete: Cascade)
+
+  @@map("invitation")
+}
+
+model Verification {
+  id         String    @id
+  identifier String
+  value      String
+  expiresAt  DateTime
+  createdAt  DateTime?
+  updatedAt  DateTime?
+
+  @@map("verification")
+}
+
+model TwoFactor {
+  id          String   @id
+  secret      String
+  backupCodes String
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  verified    Boolean?
+
+  @@map("twoFactor")
+}
+
+// ─── Phase 2 models ──────────────────────────────────────────────────────────
+
+enum AccountType {
+  ASSET
+  LIABILITY
+  EQUITY
+  REVENUE
+  EXPENSE
+}
+
+enum PeriodStatus {
+  OPEN
+  CLOSED
+  LOCKED
+}
+
+enum JournalEntryType {
+  MANUAL
+  INVOICE
+  BILL
+  PAYMENT
+  SYSTEM
+}
+
+enum EntryLineType {
+  DEBIT
+  CREDIT
+}
+
+model Company {
+  id                String   @id @default(uuid())
+  externalId        String   @unique // Linked to Better-Auth ba_organization.id
+  name              String
+  legalName         String?
+  address           String?
+  phone             String?
+  logoUrl           String?
+  taxNumberGst      String?
+  taxNumberQst      String?
+  fiscalYearStart   DateTime @default(now())
+  baseCurrency      String   @default("CAD") @db.Char(3)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  // Relations
+  profiles          UserProfile[]
+  accounts          Account[]
+  periods           FiscalPeriod[]
+  journalEntries    JournalEntry[]
+  taxRates          TaxRate[]
+  auditLogs         AuditLog[]
+  contacts          Contact[]
+  invoices          Invoice[]
+  bills             Bill[]
+  bankStatements    BankStatement[]
+  exchangeRates     ExchangeRate[]
+
+  @@index([externalId])
+}
+
+model UserProfile {
+  id         String   @id @default(uuid())
+  externalId String   @unique // Linked to Better-Auth ba_user.id
+  companyId  String
+  company    Company  @relation(fields: [companyId], references: [id])
+  role       String   @default("MEMBER")
+  locale     String   @default("fr-CA")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  @@index([companyId])
+  @@index([externalId])
+}
+
+model FiscalPeriod {
+  id         String       @id @default(uuid())
+  companyId  String
+  company    Company      @relation(fields: [companyId], references: [id])
+  startDate  DateTime
+  endDate    DateTime
+  status     PeriodStatus @default(OPEN)
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+
+  // Relations
+  journalEntries JournalEntry[]
+
+  @@index([companyId, startDate])
+}
+
+model Account {
+  id          String      @id @default(uuid())
+  companyId   String
+  company     Company     @relation(fields: [companyId], references: [id])
+  parentId    String?
+  parent      Account?    @relation("AccountTree", fields: [parentId], references: [id])
+  children    Account[]   @relation("AccountTree")
+  code        String      // e.g., "1010"
+  name        String      // e.g., "Banque"
+  type        AccountType
+  isSystem    Boolean     @default(false)
+  isActive    Boolean     @default(true)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  // Relations
+  journalLines JournalLine[]
+
+  @@unique([companyId, code])
+  @@index([companyId, parentId])
+}
+
+model JournalEntry {
+  id             String           @id @default(uuid())
+  companyId      String
+  company        Company          @relation(fields: [companyId], references: [id])
+  periodId       String
+  period         FiscalPeriod     @relation(fields: [periodId], references: [id])
+  date           DateTime
+  type           JournalEntryType @default(MANUAL)
+  description    String
+  reference      String?
+  isPosted       Boolean          @default(false)
+  postedAt       DateTime?
+  createdBy      String           // User externalId
+  createdAt      DateTime         @default(now())
+
+  // Relations
+  lines          JournalLine[]
+  invoice        Invoice?
+  bill           Bill?
+  bankTransaction BankTransaction?
+
+  @@index([companyId, date(sort: Desc)])
+  @@index([companyId, isPosted])
+}
+
+model JournalLine {
+  id             String        @id @default(uuid())
+  journalEntryId String
+  journalEntry   JournalEntry  @relation(fields: [journalEntryId], references: [id])
+  accountId      String
+  account        Account       @relation(fields: [accountId], references: [id])
+  type           EntryLineType
+  description    String?
+  
+  // Money Storage (as per DATABASE.md)
+  amount         Decimal       @db.Decimal(19, 4)
+  currency       String        @db.Char(3)
+  amountCad      Decimal       @db.Decimal(19, 4)
+  exchangeRate   Decimal       @db.Decimal(10, 6)
+
+  @@index([journalEntryId])
+  @@index([accountId])
+}
+
+model TaxRate {
+  id          String   @id @default(uuid())
+  companyId   String
+  company     Company  @relation(fields: [companyId], references: [id])
+  name        String   // e.g., "TPS"
+  code        String   // e.g., "GST"
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  periods       TaxRatePeriod[]
+  invoiceLines  InvoiceLine[]
+  billLines     BillLine[]
+
+  @@index([companyId])
+}
+
+model TaxRatePeriod {
+  id             String    @id @default(uuid())
+  taxRateId      String
+  taxRate        TaxRate   @relation(fields: [taxRateId], references: [id])
+  effectiveFrom  DateTime
+  effectiveTo    DateTime?
+  rate           Decimal   @db.Decimal(10, 6) // e.g., 0.050000
+
+  @@index([taxRateId, effectiveFrom])
+}
+
+model AuditLog {
+  id          String   @id @default(uuid())
+  companyId   String
+  company     Company  @relation(fields: [companyId], references: [id])
+  actorId     String   // User externalId
+  user        User     @relation(fields: [actorId], references: [id])
+  action      String   // e.g., 'invoice.created'
+  entityType  String
+  entityId    String
+  before      Json?
+  after       Json?
+  ipAddress   String?
+  userAgent   String?
+  createdAt   DateTime @default(now())
+
+  @@index([companyId, createdAt(sort: Desc)])
+  @@index([entityType, entityId])
+  @@map("audit_log")
+}
+
+enum ContactType {
+  CUSTOMER
+  SUPPLIER
+  BOTH
+}
+
+enum DocumentStatus {
+  DRAFT
+  SENT
+  PAID
+  VOID
+  APPROVED
+  PENDING
+}
+
+model Contact {
+  id          String      @id @default(uuid())
+  companyId   String
+  company     Company     @relation(fields: [companyId], references: [id])
+  externalId  String?     @unique // Stripe Customer ID
+  name        String
+  email       String?
+  phone       String?
+  address     String?
+  type        ContactType @default(CUSTOMER)
+  isActive    Boolean     @default(true)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+
+  // Relations
+  invoices    Invoice[]
+  bills       Bill[]
+
+  @@index([companyId, type])
+  @@index([externalId])
+}
+
+model Invoice {
+  id             String         @id @default(uuid())
+  companyId      String
+  company        Company        @relation(fields: [companyId], references: [id])
+  contactId      String
+  contact        Contact        @relation(fields: [contactId], references: [id])
+  number         String         // e.g., "INV-001"
+  date           DateTime
+  dueDate        DateTime
+  status         DocumentStatus @default(DRAFT)
+  currency       String         @db.Char(3)
+  totalAmount    Decimal        @db.Decimal(19, 4)
+  totalTax       Decimal        @db.Decimal(19, 4)
+  notes          String?
+  journalEntryId String?        @unique
+  journalEntry   JournalEntry?  @relation(fields: [journalEntryId], references: [id])
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  // Relations
+  lines          InvoiceLine[]
+
+  @@unique([companyId, number])
+  @@index([companyId, date(sort: Desc)])
+}
+
+model InvoiceLine {
+  id          String   @id @default(uuid())
+  invoiceId   String
+  invoice     Invoice  @relation(fields: [invoiceId], references: [id])
+  description String
+  quantity    Decimal  @db.Decimal(19, 4)
+  unitPrice   Decimal  @db.Decimal(19, 4)
+  taxRateId   String?
+  taxRate     TaxRate? @relation(fields: [taxRateId], references: [id])
+  amount      Decimal  @db.Decimal(19, 4)
+
+  @@index([invoiceId])
+}
+
+model Bill {
+  id             String         @id @default(uuid())
+  companyId      String
+  company        Company        @relation(fields: [companyId], references: [id])
+  contactId      String
+  contact        Contact        @relation(fields: [contactId], references: [id])
+  number         String         // Vendor's invoice number
+  date           DateTime
+  dueDate        DateTime
+  status         DocumentStatus @default(DRAFT)
+  currency       String         @db.Char(3)
+  totalAmount    Decimal        @db.Decimal(19, 4)
+  totalTax       Decimal        @db.Decimal(19, 4)
+  journalEntryId String?        @unique
+  journalEntry   JournalEntry?  @relation(fields: [journalEntryId], references: [id])
+  createdAt      DateTime       @default(now())
+  updatedAt      DateTime       @updatedAt
+
+  // Relations
+  lines          BillLine[]
+
+  @@unique([companyId, contactId, number])
+  @@index([companyId, date(sort: Desc)])
+}
+
+model BillLine {
+  id          String   @id @default(uuid())
+  billId      String
+  bill        Bill     @relation(fields: [billId], references: [id])
+  description String
+  quantity    Decimal  @db.Decimal(19, 4)
+  unitPrice   Decimal  @db.Decimal(19, 4)
+  taxRateId   String?
+  taxRate     TaxRate? @relation(fields: [taxRateId], references: [id])
+  amount      Decimal  @db.Decimal(19, 4)
+
+  @@index([billId])
+}
+
+model ProcessedWebhook {
+  id             String   @id @default(uuid())
+  provider       String   // e.g., 'stripe'
+  externalId     String   // The webhook event ID
+  processedAt    DateTime @default(now())
+
+  @@unique([provider, externalId])
+}
+
+model BankStatement {
+  id          String   @id @default(uuid())
+  companyId   String
+  company     Company  @relation(fields: [companyId], references: [id])
+  accountId   String   // The internal Account (type ASSET/Bank) linked to this statement
+  filename    String
+  importDate  DateTime @default(now())
+  
+  // Relations
+  transactions BankTransaction[]
+
+  @@index([companyId, importDate(sort: Desc)])
+}
+
+model BankTransaction {
+  id              String         @id @default(uuid())
+  statementId     String
+  statement       BankStatement  @relation(fields: [statementId], references: [id])
+  date            DateTime
+  description     String
+  amount          Decimal        @db.Decimal(19, 4)
+  reference       String?
+  
+  // Matching logic
+  isMatched       Boolean        @default(false)
+  matchedEntityId String?        // Can be InvoiceId or BillId
+  matchedEntityType String?      // 'INVOICE' | 'BILL' | 'MANUAL'
+  
+  journalEntryId  String?        @unique
+  journalEntry    JournalEntry?  @relation(fields: [journalEntryId], references: [id])
+
+  createdAt       DateTime       @default(now())
+
+  @@index([statementId])
+}
+
+model ExchangeRate {
+  id           String   @id @default(uuid())
+  companyId    String
+  company      Company  @relation(fields: [companyId], references: [id])
+  fromCurrency String   @db.Char(3)
+  toCurrency   String   @db.Char(3)
+  rate         Decimal  @db.Decimal(10, 6)
+  date         DateTime
+  
+  @@unique([companyId, fromCurrency, toCurrency, date])
+  @@index([companyId, date(sort: Desc)])
+}

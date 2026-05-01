@@ -1,0 +1,37 @@
+{
+  "name": "klariq",
+  "private": true,
+  "version": "0.1.0",
+  "packageManager": "npm@11.13.0",
+  "engines": {
+    "node": ">=20.11.0"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "test": "turbo run test",
+    "format": "prettier --write \"**/*.{ts,tsx,md,json}\" --ignore-path .prettierignore",
+    "format:check": "prettier --check \"**/*.{ts,tsx,md,json}\" --ignore-path .prettierignore",
+    "db:generate": "npm -w @klariq/db run db:generate",
+    "db:migrate": "npm -w @klariq/db run db:migrate",
+    "db:studio": "npm -w @klariq/db run db:studio",
+    "db:seed": "npm -w @klariq/db run db:seed",
+    "auth:migrate": "npm -w @klariq/api run auth:migrate",
+    "docker:up": "docker compose up -d",
+    "docker:down": "docker compose down",
+    "docker:restart": "docker compose restart"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.2",
+    "prettier": "^3.4.2",
+    "tsx": "^4.21.0",
+    "turbo": "^2.3.3",
+    "typescript": "^5.7.3"
+  }
+}

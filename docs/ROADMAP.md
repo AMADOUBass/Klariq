@@ -25,25 +25,19 @@
 
 ---
 
-## Infrastructure & Deployment (Target: Tomorrow)
+## Infrastructure & Final Features (Target: Tomorrow)
 
-**Goal:** Establish the production-ready hosting environment for Klariq.
+**Goal:** Establish the production environment and finalize core role-based access.
 
-- [ ] **Database (Neon)**
-    - [ ] Create Neon project
-    - [ ] Set up `main` and `dev` branches
-    - [ ] Configure connection strings in root `.env`
-- [ ] **Redis (Upstash)**
-    - [ ] Create Upstash Redis instance (Serverless)
-    - [ ] Configure `REDIS_URL` for BullMQ queues
-- [ ] **Backend API (Fly.io)**
-    - [ ] Initialize Fly.io app for `@klariq/api`
-    - [ ] Set up Dockerfile for NestJS production build
-    - [ ] Configure secrets (DB, Redis, Better-Auth)
-- [ ] **Frontend (Vercel)**
-    - [ ] Connect GitHub repository to Vercel
-    - [ ] Configure `@klariq/web` build settings
-    - [ ] Set up environment variables and domain mapping
+- [ ] **Infrastructure Setup**
+    - [ ] **Database (Neon)**: Create project, set up branches, configure env vars.
+    - [ ] **Redis (Upstash)**: Create instance, configure `REDIS_URL`.
+    - [ ] **Backend (Fly.io)**: Initialize app, set up Dockerfile, configure secrets.
+    - [ ] **Frontend (Vercel)**: Connect GitHub, configure build, set up domain.
+- [ ] **RBAC & Permissions (Phase 5.1 Finalization)**
+    - [ ] **Accountant Role**: Define and integrate the 'accountant' role in API decorators.
+    - [ ] **Access Mapping**: Update `AccountingController` and `InvoicingController` to allow 'accountant' access to reports/read-only views.
+    - [ ] **Invitation Flow**: Ensure the UI/API invitation flow supports the new roles.
 
 ---
 
@@ -177,7 +171,10 @@
 
 ### 5.1 Multi-user Roles & Permissions
 - [ ] Role-based access control (Owner, Admin, Accountant)
+    - [ ] Integrate 'accountant' role in NestJS `@Roles` decorators.
+    - [ ] Map granular permissions (Accountant can view reports but not edit company settings).
 - [ ] External accountant access (read-only / review)
+    - [ ] Invitation flow with specific read-only scope for external audits.
 
 ### 5.2 AI Automations (Final Polish)
 - [ ] Receipt scanning (OCR via AWS Textract/Tesseract)
@@ -193,3 +190,48 @@
 - [ ] Multi-entity (consolidated financial statements)
 - [ ] SOC 2 Type II preparation
 - [ ] Public API + Webhooks
+
+---
+
+## Project Improvements & Hardening
+
+**Goal:** Strengthen the platform for production-grade reliability and security.
+
+### 🛡️ Security & Integrity
+- [ ] **Postgres Row Level Security (RLS)**: Implement RLS policies as a final safety net for multi-tenancy.
+- [ ] **Ledger Sealing**: Cryptographically sign journal entries to prevent database-level tampering.
+- [ ] **Penetration Testing**: Audit the Auth and Tenancy guards for edge-case leaks.
+
+### ⚡ Performance & Monitoring
+- [ ] **Sentry Integration**: Add global error tracking and tracing across apps.
+- [ ] **Request Idempotency**: Implement `X-Idempotency-Key` for critical financial mutations.
+- [ ] **Caching**: Implement Redis caching for exchange rates and report summaries.
+
+### 💎 UX & Automation
+- [ ] **Automated Backups**: Scheduled export of the full ledger to secure S3/R2 storage.
+- [ ] **Bank Feed Automation**: Integrate Flinks or Plaid for real-time bank statement synchronization.
+- [ ] **AI Categorization**: Train a simple model to suggest account codes based on transaction descriptions.
+
+---
+
+## 💡 Brainstorming & Futures Idées (À réfléchir)
+
+**Objectif :** Explorer les prochaines étapes pour transformer Klariq en leader du marché.
+
+### 🎨 UI/UX Premium
+- [ ] **Thémanisation Complète** : Support natif Dark/Light mode avec palettes professionnelles.
+- [ ] **Command Bar (⌘+K)** : Navigation ultra-rapide et exécution d'actions au clavier.
+- [ ] **Collaboration Live** : Indicateurs de présence et curseurs partagés sur les rapports.
+- [ ] **Portail White-Label** : Personnalisation de l'interface client (Logo/Couleurs) pour les factures.
+
+### ⚙️ Backend & Intelligence
+- [ ] **Détection d'Anomalies (IA)** : Alertes automatiques sur les écritures inhabituelles ou erreurs potentielles.
+- [ ] **Versioning de Documents** : Historique immuable de chaque modification sur les factures et devis.
+- [ ] **Webhooks Sortants** : Intégrations avec Zapier/Make pour automatiser des workflows externes.
+- [ ] **Rate Limiting & Quotas** : Protection avancée de l'API pour les usages intensifs.
+
+### 🚀 Business Features
+- [ ] **Comptabilité par Projet** : Suivi de rentabilité granulaire lié aux projets clients.
+- [ ] **Amortissement des Actifs** : Calcul auto de la dépréciation des immobilisations (Équipement/Matériel).
+- [ ] **Paiement par Lien Magique** : Paiement simplifié pour les clients finaux sans authentification.
+- [ ] **Budgétisation & Prévisionnel** : Comparaison Réel vs Budget et projection de trésorerie.

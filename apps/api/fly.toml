@@ -25,5 +25,5 @@ primary_region = "yyz" # Toronto (closest alternative to Montreal)
   NODE_ENV = "production"
 
 # Optional: Run Prisma migrations before deployment
-[deploy]
-  release_command = "npx turbo run db:migrate:deploy && npx turbo run auth:migrate"
+# [deploy]
+#   release_command = "npx turbo run db:migrate:deploy && npx turbo run auth:migrate"

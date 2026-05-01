@@ -11,7 +11,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:integration": "vitest run --config vitest.integration.config.ts",
-    "auth:migrate": "better-auth migrate"
+    "auth:migrate": "npx better-auth migrate"
   },
   "dependencies": {
     "@klariq/db": "*",

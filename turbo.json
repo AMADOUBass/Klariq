@@ -10,6 +10,7 @@
       "cache": false
     },
     "auth:migrate": {
+      "dependsOn": ["db:migrate:deploy"],
       "cache": false
     },
     "build": {

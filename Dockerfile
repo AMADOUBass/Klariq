@@ -65,4 +65,4 @@ ENV HOME=/tmp
 EXPOSE 4000
 
 # Start the application
-CMD ["node", "apps/api/dist/src/main"]
+CMD ["node", "apps/api/dist/apps/api/src/main.js"]

@@ -1,29 +1,28 @@
-# fly.toml app configuration file generated for klariq-api
+# fly.toml app configuration file generated for klariq on 2026-05-01T19:10:03Z
 #
-# See https://fly.io/docs/reference/configuration/ for information
+# See https://fly.io/docs/reference/configuration/ for information about how to use this file.
+#
 
-app = "klariq"
-primary_region = "yyz" # Toronto (closest alternative to Montreal)
+app = 'klariq'
+primary_region = 'yyz'
 
 [build]
-  dockerfile = "../../Dockerfile" # We'll put the Dockerfile in the root
+  dockerfile = '../../Dockerfile'
+
+[env]
+  NODE_ENV = 'production'
+  PORT = '4000'
 
 [http_service]
   internal_port = 4000
   force_https = true
-  auto_stop_machines = true
+  auto_stop_machines = 'stop'
   auto_start_machines = true
   min_machines_running = 0
-  processes = ["app"]
+  processes = ['app']
 
 [[vm]]
-  size = "shared-cpu-1x"
+  size = 'shared-cpu-1x'
+  cpu_kind = 'shared'
+  cpus = 1
   memory_mb = 512
-
-[env]
-  PORT = "4000"
-  NODE_ENV = "production"
-
-# Optional: Run Prisma migrations before deployment
-# [deploy]
-#   release_command = "npx turbo run db:migrate:deploy && npx turbo run auth:migrate"

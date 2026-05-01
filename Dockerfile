@@ -23,6 +23,9 @@ RUN npm install
 COPY --from=pruner /app/out/full/ .
 
 # Generate Prisma Client (Needs turbo.json from full copy)
+# Set dummy env vars for Prisma generation
+ENV DATABASE_URL="postgresql://placeholder:placeholder@localhost:5432/placeholder"
+ENV DATABASE_DIRECT_URL="postgresql://placeholder:placeholder@localhost:5432/placeholder"
 RUN npx turbo run db:generate
 
 # Build the API

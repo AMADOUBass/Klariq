@@ -36,7 +36,7 @@ export class JournalService {
     }
 
     // 3. Create entry and lines in a transaction
-    return this.prisma.client.$transaction(async (tx) => {
+    return this.prisma.client.$transaction(async (tx: any) => {
       // Fetch rates for all unique currencies in the entry
       const currencies = [...new Set(dto.lines.map((l) => l.currency))];
       const rateMap = new Map<string, number>();
@@ -119,7 +119,7 @@ export class JournalService {
     if (!original.isPosted) throw new BadRequestException('Can only reverse posted entries');
 
     // Create a new entry with swapped Debit/Credit
-    return this.prisma.client.$transaction(async (tx) => {
+    return this.prisma.client.$transaction(async (tx: any) => {
       const reversal = await tx.journalEntry.create({
         data: {
           companyId,
@@ -130,7 +130,7 @@ export class JournalService {
           reference: `REV-${original.reference ?? original.id}`,
           createdBy: userId,
           lines: {
-            create: original.lines.map((l) => ({
+            create: original.lines.map((l: any) => ({
               accountId: l.accountId,
               // Swap type: DEBIT -> CREDIT, CREDIT -> DEBIT
               type: l.type === EntryLineType.DEBIT ? EntryLineType.CREDIT : EntryLineType.DEBIT,

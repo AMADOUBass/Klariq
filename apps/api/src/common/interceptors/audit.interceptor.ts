@@ -41,7 +41,7 @@ export class AuditInterceptor implements NestInterceptor {
                 ipAddress: ip,
                 userAgent: headers['user-agent'],
               },
-            }).catch(err => logger.error({ msg: 'Audit log persistence failed', err }));
+            }).catch((err: unknown) => logger.error({ msg: 'Audit log persistence failed', err }));
 
             logger.info({
               actor: userId,

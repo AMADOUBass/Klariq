@@ -35,14 +35,14 @@ export class DashboardService {
       where: { companyId, status: { in: [DocumentStatus.SENT, DocumentStatus.PENDING] } },
     });
 
-    const totalAR = arInvoices.reduce((sum, inv) => sum + Number(inv.totalAmount), 0);
+    const totalAR = arInvoices.reduce((sum: number, inv: any) => sum + Number(inv.totalAmount), 0);
 
     // 3. Get AP Aging (Accounts Payable)
     const apBills = await this.prisma.client.bill.findMany({
       where: { companyId, status: { in: [DocumentStatus.SENT, DocumentStatus.PENDING, DocumentStatus.APPROVED] } },
     });
 
-    const totalAP = apBills.reduce((sum, bill) => sum + Number(bill.totalAmount), 0);
+    const totalAP = apBills.reduce((sum: number, bill: any) => sum + Number(bill.totalAmount), 0);
 
     // 4. Net Profit (Revenue - Expenses)
     const revenue = await this.prisma.client.account.findMany({
@@ -85,11 +85,11 @@ export class DashboardService {
       }
     });
 
-    const recentActivity = recentEntries.map(entry => {
+    const recentActivity = recentEntries.map((entry: any) => {
       let type = 'je';
       let title = entry.description;
       let meta = entry.reference || 'Manual Entry';
-      let amount = Number(entry.lines.find(l => l.type === EntryLineType.CREDIT)?.amount || 0);
+      let amount = Number(entry.lines.find((l: any) => l.type === EntryLineType.CREDIT)?.amount || 0);
       let status = entry.isPosted ? 'posted' : 'review';
 
       if (entry.invoice) {

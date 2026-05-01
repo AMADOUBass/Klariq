@@ -157,7 +157,7 @@ export class FinancialReportingService {
           journalEntry: { date: { lte: date }, isPosted: true },
         },
       });
-      return lines.reduce((sum, l) => {
+      return lines.reduce((sum: number, l: any) => {
         const amt = l.amountCad.toNumber();
         return sum + (l.type === EntryLineType.DEBIT ? amt : -amt);
       }, 0);

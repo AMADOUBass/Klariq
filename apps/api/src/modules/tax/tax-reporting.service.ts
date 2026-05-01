@@ -19,7 +19,7 @@ export class TaxReportingService {
       },
     });
 
-    const accountMap = new Map(accounts.map((a) => [a.code, a.id]));
+    const accountMap = new Map(accounts.map((a: any) => [a.code, a.id]));
 
     // 2. Aggregate all journal lines for these accounts in the period
     const lines = await this.prisma.client.journalLine.findMany({

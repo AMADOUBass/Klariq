@@ -19,6 +19,9 @@ COPY --from=pruner /app/out/package-lock.json ./package-lock.json
 # Install dependencies
 RUN npm install
 
+# Generate Prisma Client (Crucial for monorepo types)
+RUN npx turbo run db:generate
+
 # Copy source code and build
 COPY --from=pruner /app/out/full/ .
 RUN npx turbo run build --filter=@klariq/api...

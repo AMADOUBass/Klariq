@@ -41,6 +41,9 @@ RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
 # Add a non-root user
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nestjs
+# Set correct permissions
+RUN chown -R nestjs:nodejs /app
+
 USER nestjs
 
 # Copy essential files

@@ -41,19 +41,20 @@ RUN apt-get update && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
 # Add a non-root user
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nestjs
-# Set correct permissions
-RUN chown -R nestjs:nodejs /app
-
-USER nestjs
-
 # Copy essential files
 COPY --from=builder /app/package.json .
 COPY --from=builder /app/package-lock.json .
+COPY --from=builder /app/turbo.json .
 COPY --from=builder /app/node_modules ./node_modules
 
 # Copy built applications and packages
 COPY --from=builder /app/apps/api ./apps/api
 COPY --from=builder /app/packages ./packages
+
+# Set correct permissions
+RUN chown -R nestjs:nodejs /app
+
+USER nestjs
 
 # Set environment variables
 ENV NODE_ENV=production

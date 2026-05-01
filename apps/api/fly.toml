@@ -26,4 +26,4 @@ primary_region = "yul" # Montreal (closest to Neon/Upstash ca-central-1)
 
 # Optional: Run Prisma migrations before deployment
 [deploy]
-  release_command = "npx turbo run db:migrate:deploy auth:migrate"
+  release_command = "npx turbo run db:migrate:deploy && npx turbo run auth:migrate"

@@ -84,6 +84,9 @@ export const auth: any = betterAuth({
       maxAge: 60 * 5,
     },
   },
+  advanced: {
+    crossSide: true,
+  },
 });
 
 export type Auth = typeof auth;

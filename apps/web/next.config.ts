@@ -16,6 +16,14 @@ const nextConfig: NextConfig = {
   images: {
     formats: ['image/avif', 'image/webp'],
   },
+  async rewrites() {
+    return [
+      {
+        source: '/api/:path*',
+        destination: 'https://klariq.fly.dev/api/:path*',
+      },
+    ];
+  },
 };
 
 export default withNextIntl(nextConfig);

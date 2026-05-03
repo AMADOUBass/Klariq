@@ -85,7 +85,7 @@ export const auth: any = betterAuth({
     },
   },
   advanced: {
-    crossSide: true,
+    crossSite: true,
   },
 });
 

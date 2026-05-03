@@ -21,7 +21,7 @@ const resend = new Resend(env.RESEND_API_KEY);
  */
 export const auth: any = betterAuth({
   secret: env.BETTER_AUTH_SECRET,
-  baseURL: env.NODE_ENV === 'production' ? 'https://klariq.fly.dev' : `http://localhost:${env.PORT}`,
+  baseURL: env.NODE_ENV === 'production' ? env.WEB_URL : `http://localhost:${env.PORT}`,
   trustedOrigins: [env.WEB_URL],
 
   database: new Pool({

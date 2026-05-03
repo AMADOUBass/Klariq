@@ -13,7 +13,9 @@ import { twoFactorClient } from 'better-auth/client/plugins';
  */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const authClient: any = createAuthClient({
-  baseURL: process.env['NEXT_PUBLIC_API_URL'] ?? 'http://localhost:4000',
+  baseURL: typeof window !== 'undefined' 
+    ? window.location.origin 
+    : (process.env['NEXT_PUBLIC_API_URL'] ?? 'http://localhost:4000'),
   plugins: [organizationClient(), twoFactorClient()],
 });
 

@@ -30,9 +30,9 @@
 **Goal:** Establish the production environment and finalize core role-based access.
 
 - [ ] **Infrastructure Setup**
-    - [ ] **Database (Neon)**: Create project, set up branches, configure env vars.
-    - [ ] **Redis (Upstash)**: Create instance, configure `REDIS_URL`.
-    - [ ] **Backend (Fly.io)**: Initialize app, set up Dockerfile, configure secrets.
+    - [x] **Database (Neon)**: Create project, set up branches, configure env vars.
+    - [x] **Redis (Upstash)**: Create instance, configure `REDIS_URL`.
+    - [x] **Backend (Fly.io)**: Initialize app, set up Dockerfile, configure secrets.
     - [ ] **Frontend (Vercel)**: Connect GitHub, configure build, set up domain.
 - [ ] **RBAC & Permissions (Phase 5.1 Finalization)**
     - [ ] **Accountant Role**: Define and integrate the 'accountant' role in API decorators.

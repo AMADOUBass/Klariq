@@ -11,7 +11,7 @@
   "tasks": {
     "db:generate": {
       "dependsOn": ["^db:generate"],
-      "outputs": ["src/generated/client/**"]
+      "outputs": []
     },
     "db:migrate:deploy": {
       "cache": false
